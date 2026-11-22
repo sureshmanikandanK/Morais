@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Progress Maker – Morais Eden demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..850&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+  --bg:#E7EEF6;
+  --grid:rgba(47,111,179,.07);
+  --grid-major:rgba(47,111,179,.13);
+  --blob1:rgba(120,170,230,.50);
+  --blob2:rgba(255,196,90,.40);
+  --glass:rgba(255,255,255,.58);
+  --glass-strong:rgba(255,255,255,.85);
+  --stroke:rgba(16,35,63,.11);
+  --track:rgba(16,35,63,.08);
+  --text:#10233F;
+  --muted:#53647C;
+  --plan:#2F6FB3;
+  --act:#D98500;
+  --on-act:#1A1200;
+  --ok:#17905A;
+  --warn:#B87700;
+  --late:#CF3539;
+  --shadow:0 12px 32px rgba(16,35,63,.08);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0B1D35;
+    --grid:rgba(127,178,229,.06);
+    --grid-major:rgba(127,178,229,.12);
+    --blob1:rgba(40,110,200,.45);
+    --blob2:rgba(255,160,20,.16);
+    --glass:rgba(255,255,255,.06);
+    --glass-strong:rgba(255,255,255,.12);
+    --stroke:rgba(255,255,255,.12);
+    --track:rgba(255,255,255,.09);
+    --text:#EAF1FA;
+    --muted:#9DB0C8;
+    --plan:#7FB2E5;
+    --act:#FFB020;
+    --ok:#3DD68C;
+    --warn:#FFB020;
+    --late:#FF6B6E;
+    --shadow:0 12px 32px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0B1D35;
+  --grid:rgba(127,178,229,.06);
+  --grid-major:rgba(127,178,229,.12);
+  --blob1:rgba(40,110,200,.45);
+  --blob2:rgba(255,160,20,.16);
+  --glass:rgba(255,255,255,.06);
+  --glass-strong:rgba(255,255,255,.12);
+  --stroke:rgba(255,255,255,.12);
+  --track:rgba(255,255,255,.09);
+  --text:#EAF1FA;
+  --muted:#9DB0C8;
+  --plan:#7FB2E5;
+  --act:#FFB020;
+  --ok:#3DD68C;
+  --warn:#FFB020;
+  --late:#FF6B6E;
+  --shadow:0 12px 32px rgba(0,0,0,.25);
+}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+.backdrop{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;
+  background:
+    radial-gradient(42vmax 42vmax at 88% 6%,var(--blob2),transparent 62%),
+    radial-gradient(48vmax 48vmax at 4% 96%,var(--blob1),transparent 62%),
+    var(--bg);
+}
+.bg-grid{
+  position:absolute;inset:-120px;
+  background:
+    linear-gradient(var(--grid-major) 1px,transparent 1px) 0 0/120px 120px,
+    linear-gradient(90deg,var(--grid-major) 1px,transparent 1px) 0 0/120px 120px,
+    linear-gradient(var(--grid) 1px,transparent 1px) 0 0/24px 24px,
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/24px 24px;
+  animation:gridpan 40s linear infinite;
+}
+@keyframes gridpan{to{transform:translate(120px,120px)}}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--plan);outline-offset:2px;border-radius:6px}
+
+.glass{
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  backdrop-filter:blur(18px) saturate(150%);
+  border:1px solid var(--stroke);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+}
+
+/* Layout */
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px;padding:20px;max-width:1440px;margin:0 auto}
+.side{
+  position:sticky;top:calc(20px + env(safe-area-inset-top,0px));
+  height:calc(100vh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;padding:18px 14px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.brand-mark{width:34px;height:34px;flex:none}
+.brand b{display:block;font-size:18px;font-stretch:80%;font-weight:800;line-height:1.1}
+.brand small{color:var(--muted);font-size:12.5px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:12px;color:var(--muted);text-decoration:none;font-weight:560}
+.nav a:hover{color:var(--text);background:var(--glass-strong)}
+.nav a[aria-current="page"]{color:var(--text);background:var(--glass-strong);box-shadow:inset 3px 0 0 var(--act)}
+.nav svg{width:19px;height:19px;flex:none}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px;padding:8px}
+.side-foot p{margin:0;font-size:12.5px;color:var(--muted)}
+main{min-width:0;display:flex;flex-direction:column;gap:20px;padding-bottom:12px}
+.bottomnav{display:none}
+
+/* Type & common */
+h1{font-size:clamp(30px,3.8vw,44px);font-stretch:80%;font-weight:780;line-height:1.02;margin:0;letter-spacing:-.005em}
+h2{font-size:19px;font-stretch:90%;font-weight:720;margin:0 0 2px}
+.sub{color:var(--muted);margin:6px 0 0;max-width:68ch}
+.hint{color:var(--muted);font-size:13.5px;margin:0 0 16px;max-width:70ch}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:6px 4px 0}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.panel{padding:20px 22px}
+.btn{
+  appearance:none;border:1px solid var(--stroke);background:var(--glass-strong);color:var(--text);
+  font:inherit;font-weight:620;padding:10px 16px;border-radius:12px;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+}
+.btn:hover{border-color:var(--plan)}
+.btn.primary{background:var(--act);color:var(--on-act);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn svg{width:17px;height:17px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:13px;font-weight:650;white-space:nowrap;justify-self:start}
+.chip.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.chip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}
+.chip.late{color:var(--late);background:color-mix(in srgb,var(--late) 13%,transparent)}
+.chip.plan{color:var(--plan);background:color-mix(in srgb,var(--plan) 13%,transparent)}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.bar{position:relative;display:block;height:10px;border-radius:99px;background:var(--track)}
+.bar i{position:absolute;inset:0 auto 0 0;width:var(--a);background:var(--act);border-radius:inherit}
+.bar u{position:absolute;top:-4px;bottom:-4px;left:var(--p);width:2px;margin-left:-1px;background:var(--plan);border-radius:2px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:18px;height:0;border-top:2.5px solid}
+.sw.plan{border-color:var(--plan)}
+.sw.act{border-color:var(--act)}
+.sw.fc{border-color:var(--act);border-top-style:dashed}
+.sw.box{width:12px;height:12px;border:0;border-radius:3px}
+.demo-note{font-size:12.5px;color:var(--muted)}
+
+/* Portfolio */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.stat{padding:16px 22px;border-left:1px solid var(--stroke)}
+.stat:first-child{border-left:0}
+.stat b{display:block;font-size:34px;font-stretch:68%;font-weight:800;line-height:1}
+.stat span{color:var(--muted);font-size:13.5px}
+.stat.late b{color:var(--late)} .stat.ok b{color:var(--ok)} .stat.warn b{color:var(--warn)}
+.sites{overflow:hidden}
+.sites-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:18px 22px 12px}
+.site{
+  display:grid;grid-template-columns:minmax(170px,1.3fr) minmax(150px,1.1fr) minmax(190px,1.5fr) 130px 104px;
+  align-items:center;gap:18px;padding:15px 22px;width:100%;text-align:left;
+  background:none;border:0;border-top:1px solid var(--stroke);color:inherit;font:inherit;cursor:pointer;
+}
+.site:hover{background:var(--glass-strong)}
+.site small{display:block;color:var(--muted);font-size:12.5px}
+.site-name b{font-size:16px;font-weight:700}
+.site-prog small{margin-top:7px}
+.site.featured{box-shadow:inset 3px 0 0 var(--act)}
+
+/* Project hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.hero-main{padding:24px 26px;border-right:1px solid var(--stroke)}
+.hero-num{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.hero-num b{font-size:clamp(76px,11vw,136px);font-stretch:62%;font-weight:820;line-height:.86;color:var(--late);letter-spacing:-.01em}
+.hero-num span{font-size:clamp(22px,2.4vw,30px);font-stretch:85%;font-weight:700;line-height:1.1}
+.hero-main p{margin:16px 0 0;max-width:52ch;color:var(--muted)}
+.hero-main p strong{color:var(--text);font-weight:650}
+.facts{display:grid;grid-template-columns:1fr 1fr;margin:0}
+.facts div{padding:16px 22px;border-top:1px solid var(--stroke)}
+.facts div:nth-child(-n+2){border-top:0}
+.facts div:nth-child(odd){border-right:1px solid var(--stroke)}
+.facts dt{color:var(--muted);font-size:13px}
+.facts dd{margin:2px 0 0;font-size:20px;font-stretch:86%;font-weight:700;line-height:1.2}
+.facts dd small{display:block;font-size:13px;font-stretch:100%;font-weight:500;color:var(--muted)}
+.facts .bar{margin-top:8px}
+
+/* Tower */
+.tower{display:grid;grid-template-columns:132px repeat(7,minmax(58px,1fr));gap:6px;min-width:640px}
+.tower .th{font-size:12.5px;color:var(--muted);font-weight:600;align-self:end;padding-bottom:2px;line-height:1.2}
+.floor{display:flex;flex-direction:column;justify-content:center;font-weight:650;font-size:14px;line-height:1.2;min-height:42px}
+.tags{display:flex;gap:4px;margin-top:3px}
+.tag{font-size:11px;font-weight:700;padding:1px 6px;border-radius:5px;line-height:1.4}
+.tag.plan{color:var(--plan);border:1px solid var(--plan)}
+.tag.act{color:var(--on-act);background:var(--act)}
+.cell{position:relative;min-height:42px;border-radius:8px;background:var(--track);display:grid;place-items:center;font-size:12.5px;font-weight:680;overflow:hidden;cursor:default}
+.cell::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--f,0%);transition:width .7s cubic-bezier(.2,.7,.2,1) var(--dly,0s)}
+.cell.done::before{background:color-mix(in srgb,var(--ok) 42%,transparent)}
+.cell.active::before{background:color-mix(in srgb,var(--act) 55%,transparent)}
+.cell.behind{box-shadow:inset 0 0 0 1.5px var(--late)}
+.cell.behind::before{background:color-mix(in srgb,var(--act) 55%,transparent)}
+.cell.none{background:transparent;border:1px dashed var(--stroke)}
+.cell span{position:relative}
+.tower.pre .cell::before{width:0}
+
+/* Milestones */
+.ms{list-style:none;padding:0;margin:0}
+.ms li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:12px;padding:9px 0;position:relative;align-items:start}
+.ms li::before{content:"";position:absolute;left:10px;top:28px;bottom:-10px;width:2px;background:var(--stroke)}
+.ms li:last-child::before{display:none}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--stroke);background:var(--glass-strong);display:grid;place-items:center;font-size:11px;font-weight:800;margin-top:1px}
+.ms li.done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.ms li.next .dot{border-color:var(--act);box-shadow:0 0 0 4px color-mix(in srgb,var(--act) 25%,transparent)}
+.ms b{font-weight:650;display:block;line-height:1.3}
+.ms small{color:var(--muted);font-size:13px}
+.ms .right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+
+/* Delay reasons */
+.reason{display:grid;grid-template-columns:150px minmax(0,1fr) 46px;align-items:center;gap:12px;margin:9px 0;font-size:14px}
+.reason .bar i{background:var(--late)}
+.reason b{text-align:right;font-weight:700}
+.log{list-style:none;margin:16px 0 0;padding:0;max-height:300px;overflow:auto}
+.log li{padding:11px 0;border-top:1px solid var(--stroke);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px}
+.log .meta{color:var(--muted);font-size:12.5px}
+.log p{margin:0;font-size:14px}
+
+/* Gantt */
+.gantt{min-width:860px;position:relative}
+.g-row{display:grid;grid-template-columns:270px minmax(0,1fr);align-items:center;min-height:30px;border-top:1px solid var(--stroke)}
+.g-head{border-top:0;min-height:26px}
+.g-label{font-size:13.5px;padding-right:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-label.l2{font-weight:760;font-stretch:90%;font-size:14px}
+.g-label.l3{padding-left:14px;color:var(--muted)}
+.g-track{position:relative;height:30px}
+.g-head .g-track{height:26px}
+.g-month{position:absolute;top:4px;font-size:11.5px;color:var(--muted);white-space:nowrap;padding-left:4px;border-left:1px solid var(--stroke);height:22px}
+.g-plan{position:absolute;top:6px;height:8px;border:1.5px solid var(--plan);border-radius:4px;background:color-mix(in srgb,var(--plan) 14%,transparent)}
+.g-act{position:absolute;top:16px;height:8px;border-radius:4px;
+  background:linear-gradient(90deg,var(--act) var(--p),transparent var(--p)),
+             repeating-linear-gradient(45deg,color-mix(in srgb,var(--act) 50%,transparent) 0 3px,transparent 3px 6px)}
+.g-row.l2row{background:color-mix(in srgb,var(--plan) 6%,transparent)}
+.g-today{position:absolute;top:0;bottom:0;left:calc(270px + (100% - 270px) * var(--t));width:2px;background:var(--late);opacity:.85;pointer-events:none}
+.g-today span{position:absolute;top:-2px;left:6px;font-size:11px;font-weight:700;color:var(--late);white-space:nowrap}
+
+/* Updates & crew */
+.feed{list-style:none;margin:0;padding:0}
+.feed li{padding:13px 0;border-top:1px solid var(--stroke)}
+.feed li:first-child{border-top:0;padding-top:4px}
+.feed .meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:12.5px;flex-wrap:wrap}
+.feed p{margin:4px 0 0;max-width:70ch}
+.feed .crew{font-weight:650;color:var(--text)}
+svg.chart{width:100%;height:auto;display:block}
+svg.chart text{fill:var(--muted);font-size:11px;font-family:inherit}
+
+/* Schedule */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.seg{display:inline-flex;padding:3px;border-radius:12px;background:var(--track);gap:2px;flex-wrap:wrap}
+.seg button{appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:14px;padding:7px 12px;border-radius:9px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--glass-strong);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.search{flex:1;min-width:200px;max-width:340px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:820px}
+th{text-align:left;font-weight:620;color:var(--muted);font-size:13px;padding:8px 10px;border-bottom:1px solid var(--stroke)}
+td{padding:9px 10px;border-top:1px solid var(--stroke);vertical-align:middle}
+tr.l1 td{font-weight:800;font-stretch:88%;font-size:15px}
+tr.l2 td{font-weight:740;background:color-mix(in srgb,var(--plan) 7%,transparent)}
+tr.l3 td{font-weight:640}
+td.name small{display:block;color:var(--muted);font-weight:450;font-size:12.5px}
+td .id{color:var(--muted);font-size:12px;margin-right:8px;font-weight:500}
+td.dates{white-space:nowrap}
+td.dates.fc{color:var(--muted);font-style:italic}
+.minibar{display:flex;align-items:center;gap:8px;min-width:120px}
+.minibar .bar{flex:1;height:7px}
+.minibar span{width:38px;text-align:right;font-size:13px}
+.ms-star{color:var(--act);margin-right:4px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+
+/* Forms */
+.phone{max-width:480px;width:100%;margin:0 auto}
+.field{margin-top:16px}
+.field > label,.field > .label{display:block;font-weight:620;font-size:14px;margin-bottom:6px}
+input,select,textarea{
+  width:100%;font:inherit;color:var(--text);background:var(--glass-strong);
+  border:1px solid var(--stroke);border-radius:12px;padding:11px 12px;
+}
+textarea{min-height:84px;resize:vertical}
+input[type="range"]{padding:0;background:none;border:0;accent-color:var(--act)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.range-head{display:flex;justify-content:space-between;align-items:baseline}
+.range-head output{font-size:26px;font-stretch:70%;font-weight:800}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choices label{position:relative}
+.choices input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.choices span{display:inline-block;padding:8px 13px;border-radius:99px;border:1px solid var(--stroke);background:var(--glass-strong);font-size:14px;font-weight:600}
+.choices input:checked + span{background:var(--late);border-color:var(--late);color:#fff}
+.choices input:focus-visible + span{outline:2px solid var(--plan);outline-offset:2px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--stroke);border-radius:12px;background:var(--glass-strong);cursor:pointer}
+.switch input{width:44px;height:26px;appearance:none;border-radius:99px;background:var(--track);border:1px solid var(--stroke);position:relative;cursor:pointer;padding:0;flex:none}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.switch input:checked{background:var(--late);border-color:var(--late)}
+.switch input:checked::after{left:20px}
+.delay-box{display:none;padding:14px;margin-top:10px;border-radius:12px;border:1px solid color-mix(in srgb,var(--late) 40%,transparent);background:color-mix(in srgb,var(--late) 6%,transparent)}
+.delay-box.open{display:block}
+.photo{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px;border:1.5px dashed var(--stroke);border-radius:12px;color:var(--muted);font-weight:600;cursor:pointer;background:var(--glass)}
+.form-actions{display:flex;gap:10px;margin-top:22px}
+.form-actions .btn{flex:1;justify-content:center}
+.drop{display:block;padding:24px;border:1.5px dashed color-mix(in srgb,var(--plan) 55%,transparent);border-radius:14px;text-align:center;cursor:pointer;background:color-mix(in srgb,var(--plan) 6%,transparent)}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.drop b{display:block;font-size:15px}
+.drop small{color:var(--muted)}
+.drop.has b{color:var(--ok)}
+.phase{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--stroke)}
+.phase:first-of-type{border-top:0}
+.phase small{color:var(--muted);font-size:13px}
+.big-date{font-size:40px;font-stretch:66%;font-weight:820;line-height:1}
+
+/* ---------- Motion ---------- */
+.backdrop{overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(50px);animation:drift 24s ease-in-out infinite alternate}
+.o1{width:360px;height:360px;top:6%;left:52%;background:var(--act);opacity:.22}
+.o2{width:460px;height:460px;bottom:-12%;left:-6%;background:var(--plan);opacity:.28;animation-duration:30s}
+.o3{width:280px;height:280px;top:48%;right:-6%;background:#4FD1C5;opacity:.16;animation-duration:20s}
+@keyframes drift{to{transform:translate(70px,-50px) scale(1.15)}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes fillx{from{transform:scaleX(0)}}
+
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);transition:opacity .6s ease,visibility .6s}
+#splash.gone{opacity:0;visibility:hidden}
+.splash-in{display:flex;flex-direction:column;align-items:center;gap:10px}
+.splash-in svg{width:88px;height:88px}
+.splash-in .sb{transform-box:fill-box;transform-origin:bottom;animation:barUp .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes barUp{from{transform:scaleY(0)}}
+.splash-in b{font-size:30px;font-stretch:72%;font-weight:820;letter-spacing:-.01em;animation:rise .7s .35s both}
+.splash-in span{color:var(--muted);font-size:14px;animation:rise .7s .5s both}
+.splash-line{width:170px;height:3px;border-radius:3px;background:var(--track);overflow:hidden;margin-top:6px}
+.splash-line i{display:block;height:100%;background:var(--act);animation:load 1.3s ease-in-out both}
+@keyframes load{from{width:0}to{width:100%}}
+
+main > *{animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--n,0) * 80ms)}
+.live{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:650;color:var(--ok)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:ping 1.8s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
+.bar i{transform-origin:left;animation:fillx 1.1s cubic-bezier(.2,.8,.2,1) .25s backwards}
+.bar u{animation:fadeIn .4s 1s backwards}
+.g-plan,.g-act{transform-origin:left;animation:fillx .8s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 22ms + .2s)}
+.g-act{animation-delay:calc(var(--i,0) * 22ms + .45s)}
+.g-today{animation:fadeIn .5s 1.2s backwards}
+svg .draw{stroke-dasharray:1;animation:draw 1.8s cubic-bezier(.4,0,.2,1) backwards}
+svg .draw.d2{animation-delay:.5s}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+svg .late-in{animation:fadeIn .8s 1.8s backwards}
+svg .pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-in-out 2.2s infinite}
+@keyframes pulse{50%{transform:scale(1.6)}}
+.ms li.next .dot{animation:ring 1.8s infinite}
+@keyframes ring{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--act) 12%,transparent)}}
+.btn.primary{position:relative;overflow:hidden}
+.btn.primary::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);animation:sheen 4.5s ease-in-out 2s infinite;pointer-events:none}
+@keyframes sheen{0%,70%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.site{transition:background .2s,transform .25s}
+.site:hover{transform:translateX(5px)}
+.glass.panel{transition:transform .3s,box-shadow .3s}
+.glass.panel:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(16,35,63,.14)}
+
+/* Intro hero */
+.intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:center;overflow:hidden}
+.intro-copy{padding:40px 8px 40px 38px}
+.intro h1{font-size:clamp(42px,5.6vw,76px);font-stretch:70%;font-weight:830;line-height:.94;letter-spacing:-.015em;margin-top:14px}
+.intro h1 span{display:block;animation:rise .8s cubic-bezier(.2,.8,.2,1) .15s backwards}
+.intro h1 span:nth-child(2){animation-delay:.3s}
+.intro h1 span:nth-child(3){animation-delay:.45s;color:var(--act)}
+.intro .sub{font-size:16.5px;margin-top:18px;animation:rise .8s .6s backwards}
+.intro .actions{margin-top:24px;animation:rise .8s .72s backwards}
+.ticks{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;animation:rise .8s .85s backwards}
+.tick{padding:10px 14px;border-radius:14px;background:var(--glass-strong);border:1px solid var(--stroke)}
+.tick b{display:block;font-size:26px;font-stretch:68%;font-weight:830;line-height:1}
+.tick span{font-size:12.5px;color:var(--muted)}
+.intro-art{align-self:stretch;display:flex;align-items:flex-end;padding:18px 18px 0 0}
+.intro-art svg{width:100%;height:auto;display:block}
+.scene text{font-family:inherit;font-size:11px;fill:var(--muted);font-weight:650}
+.scene .fl{transform-box:fill-box;animation:floorIn .75s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:var(--d)}
+@keyframes floorIn{from{opacity:0;transform:translateY(-30px)}}
+.scene .ghost{animation:fadeIn 1s backwards;animation-delay:var(--d)}
+.scene .ghost rect{stroke-dasharray:5 4;animation:march 1.2s linear infinite}
+@keyframes march{to{stroke-dashoffset:-9}}
+.scene .win{animation:lit 5s ease-in-out infinite;animation-delay:var(--w)}
+@keyframes lit{0%,40%,100%{fill-opacity:.22}50%,85%{fill-opacity:.95}}
+.scene .trolley{animation:trolley 9s ease-in-out infinite}
+@keyframes trolley{0%,18%{transform:translateX(440px)}42%,72%{transform:translateX(292px)}92%,100%{transform:translateX(440px)}}
+.scene .hook{animation:hook 9s ease-in-out infinite}
+@keyframes hook{0%{transform:translateY(272px)}18%,42%{transform:translateY(14px)}58%,66%{transform:translateY(118px)}80%,92%{transform:translateY(14px)}100%{transform:translateY(272px)}}
+.scene .cable{transform-box:fill-box;transform-origin:50% 0;animation:cable 9s ease-in-out infinite}
+@keyframes cable{0%{transform:scaleY(272)}18%,42%{transform:scaleY(14)}58%,66%{transform:scaleY(118)}80%,92%{transform:scaleY(14)}100%{transform:scaleY(272)}}
+.scene .beacon{animation:blink 1.2s steps(2) infinite}
+@keyframes blink{50%{opacity:.15}}
+.scene .cloud{animation:cloud 46s linear infinite}
+.scene .cloud.c2{animation-duration:64s;animation-delay:-30s}
+@keyframes cloud{from{transform:translateX(-140px)}to{transform:translateX(640px)}}
+.scene .sun{transform-box:fill-box;transform-origin:center;animation:sunp 6s ease-in-out infinite}
+@keyframes sunp{50%{transform:scale(1.1)}}
+.scene .shutter{animation:shut 1.6s ease-in-out infinite}
+@keyframes shut{50%{opacity:.35}}
+.scene .marker{animation:fadeIn .8s 1.5s backwards}
+.scene .scan{animation:scan 5s ease-in-out 1.2s infinite}
+@keyframes scan{0%{transform:translateY(336px);opacity:0}12%,88%{opacity:.9}100%{transform:translateY(186px);opacity:0}}
+
+.ticker{overflow:hidden;padding:13px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.ticker-track{display:flex;gap:44px;padding-right:44px;width:max-content;animation:tick 50s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-item{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-size:14px;color:var(--muted)}
+.ticker-item b{font-weight:700;color:var(--text)}
+.ticker-item::before{content:"";width:8px;height:8px;transform:rotate(45deg);background:var(--act);border-radius:2px;flex:none}
+@keyframes tick{to{transform:translateX(-50%)}}
+@media (max-width:1180px){
+  .intro{grid-template-columns:minmax(0,1fr)}
+  .intro-art{padding:0 16px}
+}
+@media (max-width:900px){
+  .intro-copy{padding:26px 20px 6px}
+  .intro-art{padding:0 6px}
+}
+
+/* Page heroes & looping illustrations */
+.page-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr);align-items:center;overflow:hidden}
+.page-hero .copy{padding:30px 32px}
+.page-hero h1{font-size:clamp(36px,4.6vw,58px);font-stretch:72%;font-weight:830;line-height:.96;animation:rise .7s .1s backwards}
+.page-hero .sub{animation:rise .7s .25s backwards}
+.page-hero .art{padding:16px 22px 16px 0}
+.page-hero .art svg{width:100%;height:auto;display:block;max-height:250px}
+.art text,.road text{font-family:inherit;font-size:11.5px;fill:var(--muted);font-weight:650}
+.road{width:100%;height:auto;display:block}
+@media (max-width:1180px){.page-hero{grid-template-columns:minmax(0,1fr)}.page-hero .art{padding:0 18px 16px}}
+@media (max-width:900px){.page-hero .copy{padding:22px 18px 8px}}
+.bp{fill:none;stroke:var(--plan);stroke-width:1.6;stroke-dasharray:1;animation:bpdraw 7s ease-in-out infinite}
+@keyframes bpdraw{0%{stroke-dashoffset:1;opacity:1}45%,85%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.lbar{transform-box:fill-box;transform-origin:left;animation:lbar 6s cubic-bezier(.2,.8,.2,1) infinite;animation-delay:var(--d,0s)}
+@keyframes lbar{0%{transform:scaleX(0);opacity:1}25%,85%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+.tickc{stroke-dasharray:1;animation:tickc 4.8s ease-out infinite;animation-delay:var(--d,0s)}
+@keyframes tickc{0%,10%{stroke-dashoffset:1;opacity:1}25%,88%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.arc{animation:arc 2s ease-out infinite;animation-delay:var(--d,0s)}
+@keyframes arc{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+.packet{animation:packet 2.4s linear infinite;animation-delay:var(--d,0s)}
+@keyframes packet{0%{transform:translateX(0);opacity:0}15%,85%{opacity:1}100%{transform:translateX(92px);opacity:0}}
+.badge{transform-box:fill-box;transform-origin:center;animation:badge 2.4s ease-in-out infinite}
+@keyframes badge{0%,60%,100%{transform:scale(1)}72%{transform:scale(1.4)}}
+.rowscan{animation:rowscan 4.2s steps(6) infinite}
+@keyframes rowscan{from{transform:translateY(0)}to{transform:translateY(132px)}}
+.twinkle{transform-box:fill-box;transform-origin:center;animation:twinkle 2.2s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes twinkle{0%,100%{transform:scale(.4);opacity:.3}50%{transform:scale(1);opacity:1}}
+.flowline{stroke-dasharray:6 6;animation:march2 .8s linear infinite}
+@keyframes march2{to{stroke-dashoffset:-12}}
+.glow,.blink-line{animation:shut 1.8s ease-in-out infinite}
+.art .win{animation:lit 5s ease-in-out infinite;animation-delay:var(--w)}
+.road-dash{stroke-dasharray:22 18;animation:roadm 1.6s linear infinite}
+@keyframes roadm{to{stroke-dashoffset:-40}}
+.truck{animation:driveIn 2.6s cubic-bezier(.25,.7,.25,1) .4s backwards}
+@keyframes driveIn{from{transform:translateX(-170px)}}
+.truck-body{animation:bob 1.1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-1.6px)}}
+.wheel{transform-box:fill-box;transform-origin:center;animation:spin .45s linear .4s 6}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stripes{animation:stripes .55s linear infinite}
+@keyframes stripes{to{transform:translateX(14px)}}
+.puff{transform-box:fill-box;transform-origin:center;animation:puff 1.6s ease-out infinite;animation-delay:var(--d,0s)}
+@keyframes puff{0%{transform:translate(0,0) scale(.5);opacity:.6}100%{transform:translate(-14px,-22px) scale(1.7);opacity:0}}
+.pin{animation:pinDrop .7s cubic-bezier(.3,1.5,.5,1) 2.4s backwards}
+@keyframes pinDrop{from{transform:translateY(-44px);opacity:0}}
+.gap,.gap-label{animation:fadeIn .6s 3s backwards,gapPulse 1.8s ease-in-out 3.6s infinite}
+@keyframes gapPulse{50%{opacity:.4}}
+.flag{transform-box:fill-box;transform-origin:left center;animation:wave 2.4s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes wave{50%{transform:skewY(-9deg) scaleX(.9)}}
+
+/* Live detail */
+.cell span{z-index:1}
+.cell.active::after,.cell.behind::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--f,0%);background:repeating-linear-gradient(-45deg,rgba(255,255,255,.28) 0 5px,transparent 5px 10px);background-size:14.14px 14.14px;animation:hazard 1s linear infinite}
+@keyframes hazard{to{background-position:14.14px 0}}
+.cell.behind{animation:warnPulse 2s ease-in-out infinite}
+@keyframes warnPulse{50%{box-shadow:inset 0 0 0 1.5px var(--late),0 0 0 4px color-mix(in srgb,var(--late) 18%,transparent)}}
+.chip.late::before{animation:shut 1.3s ease-in-out infinite}
+.feed > li,.log > li,.ms > li,.phase{animation:rise .55s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 80ms + .3s)}
+tbody tr{animation:fadeIn .5s backwards;animation-delay:calc(var(--i,0) * 18ms)}
+.big-date{animation:rise .5s cubic-bezier(.2,.8,.2,1) backwards}
+
+/* Success burst */
+.celebrate{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:fadeIn .25s;transition:opacity .35s}
+.celebrate.out{opacity:0}
+.cel-card{position:relative;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:12px;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.cel-card b{font-size:18px;font-weight:720}
+.cel-card svg{width:88px;height:88px}
+.cel-ring{fill:none;stroke:var(--ok);stroke-width:5;stroke-dasharray:1;animation:draw .6s ease-out backwards}
+.cel-tick{fill:none;stroke:var(--ok);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;animation:draw .4s .45s ease-out backwards}
+.confetti{position:absolute;left:50%;top:50%;width:9px;height:14px;border-radius:2px;background:var(--c);animation:burst 1.3s cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes burst{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r));opacity:0}}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+
+/* Animated background on every page */
+.beam{position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--plan) 12%,transparent),transparent);transform:rotate(20deg);animation:beam 16s ease-in-out infinite}
+@keyframes beam{0%{transform:translateX(0) rotate(20deg)}60%,100%{transform:translateX(430%) rotate(20deg)}}
+.bp-shape{position:absolute;opacity:.3;animation:spinSlow 90s linear infinite}
+.bp-shape.s1{width:320px;height:320px;top:-70px;left:-70px}
+.bp-shape.s2{width:230px;height:230px;top:34%;right:-60px;animation-direction:reverse;animation-duration:70s}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+.mote{position:absolute;bottom:-20px;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);opacity:0;animation:mote var(--dur) linear infinite;animation-delay:var(--delay)}
+@keyframes mote{0%{transform:translate(0,0);opacity:0}10%{opacity:.6}90%{opacity:.45}100%{transform:translate(var(--dx),-105vh);opacity:0}}
+.skyline{position:absolute;left:0;right:0;bottom:0;width:100%;height:250px;opacity:.85}
+.skyline .jib{transform-box:view-box;animation:jibswing var(--jd) ease-in-out infinite alternate}
+@keyframes jibswing{0%{transform:scaleX(1)}100%{transform:scaleX(-.65)}}
+.skyline .bwin{animation:lit 6s ease-in-out infinite;animation-delay:var(--w)}
+.skyline .beacon{animation:blink 1.4s steps(2) infinite}
+.skyline .rise-fl{transform-box:fill-box;animation:risefl 16s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes risefl{0%{opacity:0;transform:translateY(-10px)}6%{opacity:1;transform:none}70%{opacity:1}80%,100%{opacity:0}}
+@media (max-width:900px){.skyline{height:170px}.bp-shape.s1{width:220px;height:220px}}
+
+/* ---------- Login ---------- */
+body.auth .side,body.auth .bottomnav{display:none}
+body.auth .app{grid-template-columns:minmax(0,1fr)}
+.auth-wrap{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(340px,1fr);gap:20px;min-height:calc(100vh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+.auth-card{align-self:center;justify-self:center;width:100%;max-width:450px;padding:34px 34px 28px}
+.auth-title{font-size:clamp(34px,3.6vw,46px);font-stretch:74%;font-weight:820;line-height:1}
+.role-seg{display:flex;width:100%}
+.role-seg button{flex:1}
+.pw{position:relative}
+.pw input{padding-right:72px}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);appearance:none;border:0;background:var(--track);color:var(--text);font:inherit;font-size:13px;font-weight:650;padding:6px 10px;border-radius:8px;cursor:pointer}
+.err{display:none;color:var(--late);font-size:13px;margin:6px 0 0}
+.field.invalid .err{display:block}
+.field.invalid input{border-color:var(--late);box-shadow:0 0 0 3px color-mix(in srgb,var(--late) 15%,transparent)}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 20px;font-size:14px}
+.row-between a{color:var(--plan);font-weight:600;text-decoration:none}
+.check{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.check input{width:17px;height:17px;padding:0;accent-color:var(--act)}
+.btn.block{width:100%;justify-content:center;padding:13px 16px}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:16px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--stroke)}
+.spinner{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+.auth-card .brand,.auth-card .auth-title,.auth-card .sub,.auth-card form{animation:rise .7s cubic-bezier(.2,.8,.2,1) backwards}
+.auth-card .auth-title{animation-delay:.1s}.auth-card .sub{animation-delay:.2s}.auth-card form{animation-delay:.3s}
+
+/* Login side view: time-lapse build scene */
+.fly{position:relative;overflow:hidden;border-radius:24px;min-height:560px;isolation:isolate;box-shadow:var(--shadow);color:#fff;background:#070d24}
+.fly-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.skyA{animation:skyA 12s linear infinite}
+.skyY{animation:skyY 12s linear infinite}
+.skyD{animation:skyD 12s linear infinite}
+@keyframes skyA{0%,14%{opacity:1}24%,94%{opacity:0}100%{opacity:1}}
+@keyframes skyY{0%,14%{opacity:0}24%,44%{opacity:1}54%,100%{opacity:0}}
+@keyframes skyD{0%,44%{opacity:0}54%,62%{opacity:1}72%,100%{opacity:0}}
+.stars{animation:stars 12s linear infinite}
+@keyframes stars{0%,62%{opacity:0}74%,92%{opacity:1}98%,100%{opacity:0}}
+.tw{transform-box:fill-box;transform-origin:center;animation:twinkle 1.6s ease-in-out infinite}
+.sunarc{transform-box:view-box;transform-origin:400px 760px;animation:sunarc 12s linear infinite}
+@keyframes sunarc{0%{transform:rotate(-62deg);opacity:0}6%,60%{opacity:1}68%,100%{transform:rotate(62deg);opacity:0}}
+.moonarc{transform-box:view-box;transform-origin:400px 760px;animation:moonarc 12s linear infinite}
+@keyframes moonarc{0%,66%{transform:rotate(-38deg);opacity:0}74%,92%{opacity:1}100%{transform:rotate(30deg);opacity:0}}
+.px1{animation:px 26s linear infinite}
+.px2{animation:px 13s linear infinite}
+.px3{animation:px 6.5s linear infinite}
+.cloudL{animation:px 20s linear infinite}
+@keyframes px{to{transform:translateX(-800px)}}
+.cw{fill-opacity:.06;animation:cw 12s ease-in-out infinite}
+@keyframes cw{0%,55%{fill-opacity:.06}65%,92%{fill-opacity:.9}98%,100%{fill-opacity:.06}}
+.night-on{animation:nighton 12s ease-in-out infinite}
+@keyframes nighton{0%,56%{opacity:0}66%,92%{opacity:1}98%,100%{opacity:0}}
+.ghostb{animation:ghostb 12s linear infinite}
+@keyframes ghostb{0%,48%{opacity:.55}54%,96%{opacity:0}100%{opacity:.55}}
+.ghostb rect{stroke-dasharray:6 5;animation:march 1s linear infinite}
+.crane{animation:craneOut 12s linear infinite}
+@keyframes craneOut{0%,52%{opacity:1}60%,96%{opacity:0}100%{opacity:1}}
+.cjib{transform-box:view-box;animation:cjib 3s ease-in-out infinite alternate}
+@keyframes cjib{from{transform:scaleX(1)}to{transform:scaleX(.72)}}
+.ccable{transform-box:fill-box;transform-origin:50% 0;animation:ccable 1.4s ease-in-out infinite}
+@keyframes ccable{50%{transform:scaleY(1.52)}}
+.cload{animation:cload 1.4s ease-in-out infinite}
+@keyframes cload{50%{transform:translateY(26px)}}
+.cbeacon{animation:blink 1s steps(2) infinite}
+.roaddash{animation:rd .56s linear infinite}
+@keyframes rd{to{stroke-dashoffset:64}}
+.carR{animation:driveR var(--t) linear infinite;animation-delay:var(--dl)}
+.carL{animation:driveL var(--t) linear infinite;animation-delay:var(--dl)}
+@keyframes driveR{from{transform:translateX(-80px)}to{transform:translateX(880px)}}
+@keyframes driveL{from{transform:translateX(880px)}to{transform:translateX(-80px)}}
+.birds{animation:birds 9s linear infinite}
+@keyframes birds{0%{transform:translate(-120px,0);opacity:0}5%,40%{opacity:1}50%,100%{transform:translate(920px,-40px);opacity:0}}
+.wing{transform-box:fill-box;transform-origin:center;animation:wing .35s ease-in-out infinite alternate}
+@keyframes wing{to{transform:scaleY(-.6)}}
+.handover{transform-box:fill-box;transform-origin:center;animation:handover 12s cubic-bezier(.2,1.4,.4,1) infinite}
+@keyframes handover{0%,80%{opacity:0;transform:translateY(12px) scale(.7)}83%,93%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.fly-vig{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(6,9,20,.62) 0%,rgba(6,9,20,.25) 30%,transparent 46%),linear-gradient(to top,rgba(6,9,20,.85) 0%,rgba(6,9,20,.35) 18%,transparent 30%),linear-gradient(to right,rgba(6,9,20,.45),transparent 50%)}
+.fly-top{position:absolute;top:22px;left:26px;right:26px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.fly-chip{padding:6px 13px;border-radius:99px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-size:13px;font-weight:620;color:#fff;display:inline-flex;align-items:center;gap:8px}
+.fly-chip i{width:8px;height:8px;border-radius:50%;background:#3DD68C;animation:ping 1.8s infinite}
+.fly-copy{position:absolute;left:30px;right:30px;top:72px}
+.fly-bottom{position:absolute;left:30px;right:30px;bottom:24px}
+.fly-copy h2{margin:0;font-size:clamp(38px,4.8vw,68px);font-stretch:70%;font-weight:820;line-height:.95;letter-spacing:-.015em;color:#fff;max-width:10ch;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.fly-cap{display:grid;margin-top:14px;max-width:46ch}
+.fly-cap span{grid-area:1 / 1;color:rgba(255,255,255,.88);font-size:15.5px}
+.cap-a{animation:capA 12s linear infinite}
+.cap-b{opacity:0;animation:capB 12s linear infinite}
+.cap-c{opacity:0;animation:capC 12s linear infinite}
+@keyframes capA{0%,46%{opacity:1}50%,96%{opacity:0}100%{opacity:1}}
+@keyframes capB{0%,46%{opacity:0}50%,76%{opacity:1}80%,100%{opacity:0}}
+@keyframes capC{0%,76%{opacity:0}80%,96%{opacity:1}100%{opacity:0}}
+.fly-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px;max-width:520px}
+.fly-steps div{font-size:12.5px;font-weight:650;color:rgba(255,255,255,.85)}
+.fly-steps i{display:block;height:3px;border-radius:3px;background:rgba(255,255,255,.22);margin-top:6px;overflow:hidden;position:relative}
+.fly-steps i::after{content:"";position:absolute;inset:0;background:#FFB020;transform-origin:left;animation:var(--an) 12s linear infinite}
+@keyframes st1{0%{transform:scaleX(0)}50%,100%{transform:scaleX(1)}}
+@keyframes st2{0%,50%{transform:scaleX(0)}80%,100%{transform:scaleX(1)}}
+@keyframes st3{0%,80%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+@media (max-width:980px){
+  .auth-wrap{grid-template-columns:minmax(0,1fr);min-height:0}
+  .fly{min-height:440px}
+  .auth-card{max-width:560px}
+}
+@media (max-width:900px){
+  body.auth .app{padding:12px}
+  .fly{min-height:400px;border-radius:20px}
+  .fly-copy{left:20px;right:20px;top:64px}.fly-bottom{left:20px;right:20px;bottom:18px}
+  .auth-card{padding:26px 20px 22px}
+}
+
+#toast{
+  position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);
+  background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:calc(100% - 32px);
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:1180px){
+  .grid2{grid-template-columns:minmax(0,1fr)}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero-main{border-right:0;border-bottom:1px solid var(--stroke)}
+}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr);padding:14px 12px 104px}
+  .side{display:none}
+  .bottomnav{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;justify-content:space-around;
+    border-radius:18px 18px 0 0;border-bottom:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));
+  }
+  .bottomnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border-radius:10px;font-size:11.5px;font-weight:600;color:var(--muted);text-decoration:none;min-width:58px}
+  .bottomnav a[aria-current="page"]{color:var(--text);background:var(--glass-strong)}
+  .bottomnav svg{width:21px;height:21px}
+  #toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+  .site{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding:14px 16px}
+  .site-name{grid-column:1}
+  .site .chip{grid-column:2;grid-row:1;justify-self:end}
+  .site-stage,.site-prog{grid-column:1 / -1}
+  .site-ho{display:none}
+  .panel{padding:18px 16px}
+  .stat{padding:14px 16px}
+  .stat:nth-child(odd){border-left:0}
+  .strip{grid-template-columns:1fr 1fr}
+  .stat:nth-child(n+3){border-top:1px solid var(--stroke)}
+  .facts{grid-template-columns:1fr}
+  .facts div{border-right:0 !important;border-top:1px solid var(--stroke) !important}
+  .facts div:first-child{border-top:0 !important}
+  .hero-main{padding:20px 18px}
+  .reason{grid-template-columns:110px minmax(0,1fr) 40px}
+  .page-head .actions{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+@media print{
+  .side,.bottomnav,.actions,#toast,.backdrop{display:none !important}
+  .app{display:block;padding:0}
+  body{background:#fff;color:#000}
+  .glass{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border-color:#ccc;break-inside:avoid}
+  main{gap:12px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span></div>
+<div id="splash" aria-hidden="true"><div class="splash-in">
+  <svg viewBox="0 0 34 34"><rect x="2" y="2" width="30" height="30" rx="9" style="fill:var(--act)"/><rect class="sb" x="7.5" y="15" width="3" height="10" rx="1.5" style="fill:var(--on-act);animation-delay:.1s"/><rect class="sb" x="12.5" y="11" width="3" height="14" rx="1.5" style="fill:var(--on-act);animation-delay:.22s"/><rect class="sb" x="17.5" y="17" width="3" height="8" rx="1.5" style="fill:var(--on-act);animation-delay:.34s"/><rect class="sb" x="22.5" y="8" width="3" height="17" rx="1.5" style="fill:var(--on-act);animation-delay:.46s"/></svg>
+  <b>Progress Maker</b><span>Loading site data</span><div class="splash-line"><i></i></div>
+</div></div>
+
+<div class="app">
+  <aside class="side glass" aria-label="Main">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="2" y="2" width="30" height="30" rx="9" fill="var(--act)"/>
+        <path d="M9 25V15M14 25V11M19 25V17M24 25V8" stroke="var(--on-act)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div><b>Progress Maker</b><small>Morais Developers</small></div>
+    </div>
+    <nav class="nav" id="sideNav"></nav>
+    <div class="side-foot">
+      <span class="live"><i></i>Site data synced</span>
+      <button class="btn" id="themeBtn" type="button">Switch theme</button>
+      <a class="btn" href="#login">Sign out</a>
+      <p>Demo with sample progress data. Schedule taken from the Morais Eden revised schedule dated 31 Oct 2026.</p>
+    </div>
+  </aside>
+  <main id="view" tabindex="-1"></main>
+</div>
+
+<nav class="bottomnav glass" id="bottomNav" aria-label="Main"></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- Schedule data (Morais Eden revised schedule, 31-10-2026) ---------- */
+const RAW = `1|1|Morais Eden construction schedule|31-10-26|31-01-28
+2|2|Sub-structure|31-10-26|10-11-26
+3|3|Plinth beam & stilt floor PCC work|31-10-26|10-11-26
+4|4|Plinth beam concrete work|31-10-26|31-10-26
+5|4|PCC for stilt floor flooring|01-11-26|10-11-26
+6|2|Super-structure|11-11-26|01-09-27
+7|3|Stilt floor roof slab|11-11-26|15-12-26
+8|4|Column overlapping & starter concrete|11-11-26|15-11-26
+9|4|Column & waist slab concreting works|14-11-26|23-11-26
+10|4|Beam bottom & roof slab shuttering work|24-11-26|07-12-26
+11|4|Roof slab steel fabrication work|01-12-26|10-12-26
+12|4|MEP – slab conduiting work|11-12-26|14-12-26
+13|4|Stilt floor roof slab concrete work|15-12-26|15-12-26
+14|3|Stilt floor roof slab – curing & deshuttering|16-12-26|04-01-27
+15|4|Stilt floor roof slab – curing work|16-12-26|29-12-26
+16|4|Stilt floor roof slab – deshuttering work|30-12-26|04-01-27
+17|3|1st floor roof slab|16-12-26|24-01-27
+18|4|Stilt floor roof slab – stage 1 curing work|16-12-26|22-12-26
+19|4|Column overlapping & starter concrete|23-12-26|27-12-26
+20|4|Column & waist slab concreting works|26-12-26|04-01-27
+21|4|Beam bottom & roof slab shuttering work|05-01-27|18-01-27
+22|4|Roof slab steel fabrication work|12-01-27|21-01-27
+23|4|MEP – slab conduiting work|20-01-27|23-01-27
+24|4|1st floor roof slab concrete work|24-01-27|24-01-27
+25|3|1st floor roof slab – curing & deshuttering|25-01-27|13-02-27
+26|4|1F roof slab – curing work|25-01-27|07-02-27
+27|4|1F roof slab – deshuttering work|08-02-27|13-02-27
+28|3|2nd floor roof slab|25-01-27|05-03-27
+29|4|1F roof slab – stage 1 curing work|25-01-27|31-01-27
+30|4|Column overlapping & starter concrete|01-02-27|05-02-27
+31|4|Column & waist slab concreting works|04-02-27|13-02-27
+32|4|Beam bottom & roof slab shuttering work|14-02-27|27-02-27
+33|4|Roof slab steel fabrication work|21-02-27|02-03-27
+34|4|MEP – slab conduiting work|01-03-27|04-03-27
+35|4|2nd floor roof slab concrete work|05-03-27|05-03-27
+36|3|2nd floor roof slab – curing & deshuttering|06-03-27|25-03-27
+37|4|2F roof slab – curing work|06-03-27|19-03-27
+38|4|2F roof slab – deshuttering work|20-03-27|25-03-27
+39|3|3rd floor roof slab|06-03-27|14-04-27
+40|4|2F roof slab – stage 1 curing work|06-03-27|12-03-27
+41|4|Column overlapping & starter concrete|13-03-27|17-03-27
+42|4|Column & waist slab concreting works|16-03-27|25-03-27
+43|4|Beam bottom & roof slab shuttering work|26-03-27|08-04-27
+44|4|Roof slab steel fabrication work|02-04-27|11-04-27
+45|4|MEP – slab conduiting work|10-04-27|13-04-27
+46|4|3rd floor roof slab concrete work|14-04-27|14-04-27
+47|3|3rd floor roof slab – curing & deshuttering|15-04-27|04-05-27
+48|4|3F roof slab – curing work|15-04-27|28-04-27
+49|4|3F roof slab – deshuttering work|29-04-27|04-05-27
+50|3|4th floor roof slab|15-04-27|24-05-27
+51|4|3F roof slab – stage 1 curing work|15-04-27|21-04-27
+52|4|Column overlapping & starter concrete|22-04-27|26-04-27
+53|4|Column & waist slab concreting works|25-04-27|04-05-27
+54|4|Beam bottom & roof slab shuttering work|05-05-27|18-05-27
+55|4|Roof slab steel fabrication work|12-05-27|21-05-27
+56|4|MEP – slab conduiting work|20-05-27|23-05-27
+57|4|4th floor roof slab concrete work|24-05-27|24-05-27
+58|3|4th floor roof slab – curing & deshuttering|25-05-27|13-06-27
+59|4|4F roof slab – curing work|25-05-27|07-06-27
+60|4|4F roof slab – deshuttering work|08-06-27|13-06-27
+61|3|5th floor roof slab|25-05-27|03-07-27
+62|4|4F roof slab – stage 1 curing work|25-05-27|31-05-27
+63|4|Column overlapping & starter concrete|01-06-27|05-06-27
+64|4|Column & waist slab concreting works|04-06-27|13-06-27
+65|4|Beam bottom & roof slab shuttering work|14-06-27|27-06-27
+66|4|Roof slab steel fabrication work|21-06-27|30-06-27
+67|4|MEP – slab conduiting work|29-06-27|02-07-27
+68|4|5th floor roof slab concrete work|03-07-27|03-07-27
+69|3|5th floor roof slab – curing & deshuttering|04-07-27|23-07-27
+70|4|5F roof slab – curing work|04-07-27|17-07-27
+71|4|5F roof slab – deshuttering work|18-07-27|23-07-27
+72|3|Terrace work|04-07-27|01-09-27
+73|4|5F roof slab – stage 1 curing work|04-07-27|10-07-27
+74|4|Parapet column work|11-07-27|20-07-27
+75|4|Lift headroom|11-07-27|25-07-27
+76|4|Staircase headroom|14-07-27|28-07-27
+77|4|OHT column & base slab|29-07-27|12-08-27
+78|4|OHT retaining wall concrete|13-08-27|22-08-27
+79|4|OHT cover slab|23-08-27|01-09-27
+80|2|Masonry work|14-02-27|25-12-27
+81|3|Block work & lintel work|14-02-27|11-09-27
+82|4|First floor block work & lintel work|14-02-27|30-03-27
+83|4|Second floor block work & lintel work|26-03-27|09-05-27
+84|4|Third floor block work & lintel work|05-05-27|18-06-27
+85|4|Fourth floor block work & lintel work|14-06-27|28-07-27
+86|4|Fifth floor block work & lintel work|24-07-27|06-09-27
+87|4|Terrace floor block work & lintel work|29-07-27|11-09-27
+88|3|MEP fix 1 – wall chasing & conduiting|16-03-27|21-09-27
+89|4|1F wall chasing & conduiting work|16-03-27|09-04-27
+90|4|2F wall chasing & conduiting work|25-04-27|19-05-27
+91|4|3F wall chasing & conduiting work|04-06-27|28-06-27
+92|4|4F wall chasing & conduiting work|14-07-27|07-08-27
+93|4|5F wall chasing & conduiting work|23-08-27|16-09-27
+94|4|Terrace floor electrical & plumbing work|28-08-27|21-09-27
+95|3|Internal plastering works|05-04-27|26-10-27
+96|4|First floor internal plastering works|05-04-27|14-05-27
+97|4|Second floor internal plastering works|15-05-27|23-06-27
+98|4|Third floor internal plastering works|24-06-27|02-08-27
+99|4|Fourth floor internal plastering works|03-08-27|11-09-27
+100|4|Fifth floor internal plastering works|12-09-27|21-10-27
+101|4|Terrace floor internal plastering works|17-09-27|26-10-27
+102|3|Door frame & safety grill fixing|05-05-27|31-10-27
+103|4|1F door frame & safety grill fixing work|05-05-27|24-05-27
+104|4|2F door frame & safety grill fixing work|14-06-27|03-07-27
+105|4|3F door frame & safety grill fixing work|24-07-27|12-08-27
+106|4|4F door frame & safety grill fixing work|02-09-27|21-09-27
+107|4|5F door frame & safety grill fixing work|12-10-27|31-10-27
+108|3|MEP fix 2 – plumbing wall piping|10-05-27|05-11-27
+109|4|1F concealed plumbing pipeline work|10-05-27|24-05-27
+110|4|2F concealed plumbing pipeline work|19-06-27|03-07-27
+111|4|3F concealed plumbing pipeline work|29-07-27|12-08-27
+112|4|4F concealed plumbing pipeline work|07-09-27|21-09-27
+113|4|5F concealed plumbing pipeline work|17-10-27|31-10-27
+114|4|Terrace floor electrical & plumbing work|22-10-27|05-11-27
+115|3|Waterproofing work|20-05-27|25-11-27
+116|4|First floor waterproofing work|20-05-27|29-05-27
+117|4|Second floor waterproofing work|29-06-27|08-07-27
+118|4|Third floor waterproofing work|08-08-27|17-08-27
+119|4|Fourth floor waterproofing work|17-09-27|26-09-27
+120|4|Fifth floor waterproofing work|27-10-27|05-11-27
+121|4|Terrace floor waterproofing work|06-11-27|25-11-27
+122|3|MEP fix 3 – floor concealed & sunken filling|25-05-27|30-11-27
+123|4|1F floor concealed piping & sunken filling|25-05-27|13-06-27
+124|4|2F floor concealed piping & sunken filling|04-07-27|23-07-27
+125|4|3F floor concealed piping & sunken filling|13-08-27|01-09-27
+126|4|4F floor concealed piping & sunken filling|22-09-27|11-10-27
+127|4|5F floor concealed piping & sunken filling|01-11-27|20-11-27
+128|4|Terrace screed concrete work|26-11-27|30-11-27
+129|3|Services internal plastering|17-09-27|25-12-27
+130|4|Shaft internal plastering|11-11-27|25-12-27
+131|4|Staircase internal plastering|17-09-27|16-10-27
+132|3|Elevation & external plastering|12-08-27|10-10-27
+133|4|Overall external elevation works|12-08-27|25-09-27
+134|4|Overall building external plastering|12-08-27|10-10-27
+135|2|Finishing work|10-05-27|14-01-28
+136|3|Internal white cement & 1 coat putty|10-05-27|31-10-27
+137|4|First floor white cement & 1 coat putty|10-05-27|24-05-27
+138|4|Second floor white cement & 1 coat putty|19-06-27|03-07-27
+139|4|Third floor white cement & 1 coat putty|29-07-27|12-08-27
+140|4|Fourth floor white cement & 1 coat putty|07-09-27|21-09-27
+141|4|Fifth floor white cement & 1 coat putty|17-10-27|31-10-27
+142|3|Tile laying works|20-05-27|06-01-28
+143|4|First floor tile laying work|20-05-27|18-07-27
+144|4|Second floor tile laying work|29-06-27|27-08-27
+145|4|Third floor tile laying work|08-08-27|06-10-27
+146|4|Fourth floor tile laying work|17-09-27|15-11-27
+147|4|Fifth floor tile laying work|27-10-27|25-12-27
+148|4|Terrace floor cooling tile laying work|08-12-27|06-01-28
+149|4|Staircase & counter top granite laying work|17-10-27|15-12-27
+150|3|MEP final fixing – wires, sockets etc.|09-07-27|09-01-28
+151|4|First floor MEP final fix works|09-07-27|02-08-27
+152|4|Second floor MEP final fix works|18-08-27|11-09-27
+153|4|Third floor MEP final fix works|27-09-27|21-10-27
+154|4|Fourth floor MEP final fix works|06-11-27|30-11-27
+155|4|Fifth floor MEP final fix works|16-12-27|09-01-28
+156|4|Common area MEP final fix works|06-12-27|30-12-27
+157|3|Final putty & primer works|09-07-27|04-01-28
+158|4|First floor putty & primer work|09-07-27|28-07-27
+159|4|Second floor putty & primer work|18-08-27|06-09-27
+160|4|Third floor putty & primer work|27-09-27|16-10-27
+161|4|Fourth floor putty & primer work|06-11-27|25-11-27
+162|4|Fifth floor putty & primer work|16-12-27|04-01-28
+163|4|Common area putty & primer work|06-12-27|25-12-27
+164|3|Internal final painting works|24-07-27|14-01-28
+165|4|First floor final painting work|24-07-27|07-08-27
+166|4|Second floor final painting work|02-09-27|16-09-27
+167|4|Third floor final painting work|12-10-27|26-10-27
+168|4|Fourth floor final painting work|21-11-27|05-12-27
+169|4|Fifth floor final painting work|31-12-27|14-01-28
+170|4|Common area painting work|21-12-27|04-01-28
+171|3|Elevation texture & painting|11-10-27|09-12-27
+172|4|Elevation & external texture painting work|11-10-27|09-12-27
+173|3|Stilt floor finishing work|11-10-27|04-01-28
+174|4|Shaft MEP plumbing work|21-11-27|04-01-28
+175|4|Lift lobby & EB room work|11-10-27|24-11-27
+176|4|Security room & driver's toilet|11-10-27|24-11-27
+177|4|Parking screed concrete work|25-11-27|29-11-27
+178|4|MEP final fix work|30-11-27|24-12-27
+179|3|Final works|12-09-27|14-01-28
+180|4|Lift procurement & installation works|12-09-27|09-01-28
+181|4|Staircase handrails work|16-12-27|14-01-28
+182|4|Door fixing work|17-09-27|15-11-27
+183|4|Balcony glass & handrail works|16-11-27|14-01-28
+184|4|UPVC window fixing works|11-10-27|09-12-27
+185|4|Toilet fittings fixing work|12-10-27|25-11-27
+186|2|Infrastructure|11-10-27|29-01-28
+187|3|Final & external works|11-10-27|29-01-28
+188|4|Compound wall works|11-10-27|09-12-27
+189|4|External plumbing & chamber works|11-10-27|09-11-27
+190|4|External flooring & paver work|31-10-27|14-12-27
+191|4|MEP – HT & LT and transformer work|10-11-27|08-01-28
+192|4|Compound wall finishing & gate fixing|06-11-27|20-12-27
+193|4|Miscellaneous work|01-12-27|29-01-28
+194|2|Handover|27-12-27|31-01-28
+195|3|Final testing & commissioning|27-12-27|30-01-28
+196|4|Final testing & commissioning work|27-12-27|25-01-28
+197|4|Snag list completion & cleaning|01-01-28|30-01-28
+198|3|Handover|31-01-28|31-01-28
+199|4|Handover|31-01-28|31-01-28`;
+
+const MILESTONE_IDS = new Set([13,24,35,46,57,68,134,199]);
+
+/* ---------- Helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function D(s){ const [d,m,y] = s.split("-").map(Number); return Math.round(Date.UTC(2000 + y, m - 1, d) / 864e5); }
+function fromISO(s){ const [y,m,d] = s.split("-").map(Number); return Math.round(Date.UTC(y, m - 1, d) / 864e5); }
+function toISO(n){ return new Date(n * 864e5).toISOString().slice(0,10); }
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmt(n, short){ const d = new Date(n * 864e5); const s = d.getUTCDate() + " " + MON[d.getUTCMonth()]; return short ? s : s + " " + d.getUTCFullYear(); }
+function pctTxt(v){ const p = v * 100; return (p < 10 ? p.toFixed(1) : Math.round(p)) + "%"; }
+function frac(a, b, d){ if (d < a) return 0; if (d >= b) return 1; return (d - a + 1) / (b - a + 1); }
+const plural = (n, w) => n + " " + w + (Math.abs(n) === 1 ? "" : "s");
+
+/* ---------- Demo snapshot ---------- */
+// Sample "actual" progress: the site slips a little at each slab, ending 9 days behind.
+const TODAY = D("20-04-27");
+const START = D("31-10-26"), END = D("31-01-28");
+const DELAY_PTS = [[D("31-10-26"),0],[D("15-12-26"),3],[D("24-01-27"),5],[D("05-03-27"),7],[D("14-04-27"),9]];
+function delayAt(d){
+  if (d <= DELAY_PTS[0][0]) return 0;
+  for (let i = 1; i < DELAY_PTS.length; i++){
+    const [a,da] = DELAY_PTS[i-1], [b,db] = DELAY_PTS[i];
+    if (d <= b) return da + (db - da) * (d - a) / (b - a);
+  }
+  return DELAY_PTS[DELAY_PTS.length - 1][1];
+}
+
+/* ---------- Build task model ---------- */
+const TASKS = RAW.trim().split("\n").map(l => {
+  const [id, lv, name, s, f] = l.split("|");
+  return { id:+id, lv:+lv, name, s:D(s), f:D(f) };
+});
+const BY_ID = {};
+(function build(){
+  const stack = [];
+  TASKS.forEach((t, i) => {
+    BY_ID[t.id] = t;
+    const n = TASKS[i + 1];
+    t.leaf = !n || n.lv <= t.lv;
+    t.ms = MILESTONE_IDS.has(t.id);
+    t.dur = t.f - t.s + 1;
+    while (stack.length && stack[stack.length - 1].lv >= t.lv) stack.pop();
+    t.parent = stack[stack.length - 1] || null;
+    stack.push(t);
+  });
+  TASKS.filter(t => t.leaf).forEach(t => {
+    t.as = t.s + Math.round(delayAt(t.s));
+    t.af = Math.max(t.as, t.f + Math.round(delayAt(t.f)));
+    t.pPlan = frac(t.s, t.f, TODAY);
+    t.pAct = frac(t.as, t.af, TODAY);
+    let p = t.parent;
+    while (p){ (p.kids = p.kids || []).push(t); p = p.parent; }
+  });
+  TASKS.filter(t => !t.leaf).forEach(t => {
+    let W = 0, pp = 0, pa = 0, as = Infinity, af = -Infinity;
+    t.kids.forEach(k => { W += k.dur; pp += k.dur * k.pPlan; pa += k.dur * k.pAct; as = Math.min(as, k.as); af = Math.max(af, k.af); });
+    t.pPlan = pp / W; t.pAct = pa / W; t.as = as; t.af = af;
+  });
+})();
+const PROJECT = TASKS[0];
+const LEAVES = PROJECT.kids;
+const W_ALL = LEAVES.reduce((s, k) => s + k.dur, 0);
+const planAt = d => LEAVES.reduce((s, k) => s + k.dur * frac(k.s, k.f, d), 0) / W_ALL;
+const actAt  = d => LEAVES.reduce((s, k) => s + k.dur * frac(k.as, k.af, d), 0) / W_ALL;
+const CUR_DELAY = Math.round(delayAt(TODAY));
+const FORECAST_END = END + CUR_DELAY;
+
+function status(t){
+  if (t.pAct >= 1) return "done";
+  if (t.pAct > 0) return "active";
+  if (t.pPlan > 0) return "late-start";
+  return "upcoming";
+}
+const isBehind = t => t.pPlan - t.pAct > 0.02;
+function contextName(t){
+  const p = t.parent;
+  if (!p || p.lv < 3) return "";
+  return p.name;
+}
+
+/* ---------- Sample site data ---------- */
+let DELAYS = [
+  {d:"08-04-27", task:"3F roof slab steel fabrication", cat:"Weather", days:1, note:"Unseasonal heavy rain, work stopped after 11 am."},
+  {d:"22-03-27", task:"3F column & waist slab concreting", cat:"Material", days:1, note:"12 mm TMT steel short supplied, balance arrived next day."},
+  {d:"25-02-27", task:"2F beam bottom & roof slab shuttering", cat:"Drawings & approvals", days:1, note:"Beam layout revised by the structural consultant."},
+  {d:"10-02-27", task:"2F column & waist slab concreting", cat:"Equipment", days:1, note:"Concrete pump broke down, RMC trucks sent back."},
+  {d:"15-01-27", task:"1F beam bottom & roof slab shuttering", cat:"Labour", days:1, note:"Pongal holidays, 40 of 70 workers on site."},
+  {d:"02-01-27", task:"Stilt floor slab deshuttering", cat:"Weather", days:1, note:"Cyclone warning, site closed for the day."},
+  {d:"08-12-26", task:"Stilt floor slab steel fabrication", cat:"Material", days:1, note:"TMT steel delivery delayed by the supplier."},
+  {d:"18-11-26", task:"Stilt floor column overlapping", cat:"Labour", days:1, note:"Only 32 of 50 workers reported."},
+  {d:"03-11-26", task:"PCC for stilt floor flooring", cat:"Weather", days:1, note:"Heavy northeast monsoon rain, site waterlogged."}
+].map(x => ({...x, d:D(x.d)}));
+const CATS = ["Weather","Labour","Material","Equipment","Drawings & approvals"];
+
+let UPDATES = [
+  {d:D("20-04-27"), who:"Karthik R, site engineer", text:"3F roof slab steel fabrication completed. Slab conduiting under way, concrete pour booked for 23 Apr.", crew:[85,72]},
+  {d:D("19-04-27"), who:"Karthik R, site engineer", text:"2F block work continuing on the north side. Three masons short today.", crew:[85,74]},
+  {d:D("18-04-27"), who:"Priya S, MEP engineer", text:"1F wall chasing and conduiting complete. Plastering team can take over the east wing.", crew:[85,75]},
+  {d:D("17-04-27"), who:"Karthik R, site engineer", text:"3F beam bottom shuttering finished and checked by the structural consultant.", crew:[85,68]}
+];
+const CREW = [78,81,80,76,70,79,82,77,73,69,68,75,74,72];
+
+let SITES = [
+  {id:"eden", name:"Morais Eden", type:"Stilt + 5 floors", live:true},
+  {id:"palm", name:"Palm Residency", type:"G + 4 apartments", planned:62, actual:60, delay:2, stage:"Internal plastering, 3rd floor", handover:"Aug 2027"},
+  {id:"lake", name:"Lake View Towers", type:"G + 20 high-rise", planned:34, actual:28, delay:18, stage:"7th floor roof slab", handover:"Mar 2029"},
+  {id:"meadow", name:"Green Meadows Villas", type:"48 row villas", planned:81, actual:82, delay:-1, stage:"Final painting", handover:"Jul 2027"},
+  {id:"orchid", name:"Orchid Enclave", type:"Stilt + 6 floors", planned:9, actual:9, delay:0, stage:"Stilt floor roof slab", handover:"Jun 2028"},
+  {id:"metro", name:"Metro Business Park", type:"G + 8 commercial", planned:47, actual:41, delay:12, stage:"Block work, 5th floor", handover:"Dec 2027"},
+  {id:"sunrise", name:"Sunrise Homes", type:"G + 3 apartments", planned:96, actual:93, delay:4, stage:"Snag list & cleaning", handover:"May 2027"}
+];
+(function fillEden(){
+  const e = SITES[0];
+  e.planned = +(PROJECT.pPlan * 100).toFixed(1);
+  e.actual = +(PROJECT.pAct * 100).toFixed(1);
+  e.delay = CUR_DELAY;
+  e.stage = "3rd floor roof slab";
+  const d = new Date(FORECAST_END * 864e5);
+  e.handover = MON[d.getUTCMonth()] + " " + d.getUTCFullYear();
+})();
+
+function siteStatus(s){
+  if (s.upcoming) return ["plan","Not started"];
+  if (s.delay < 0) return ["ok", plural(-s.delay,"day") + " ahead"];
+  if (s.delay === 0) return ["ok","On track"];
+  if (s.delay <= 7) return ["warn", plural(s.delay,"day") + " behind"];
+  return ["late", plural(s.delay,"day") + " behind"];
+}
+
+/* ---------- Navigation ---------- */
+const ICONS = {
+  portfolio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  project:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-5h6v5M8 11h2M14 11h2"/></svg>',
+  schedule:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h3M10 6h10M4 12h6M13 12h7M4 18h9M16 18h4"/></svg>',
+  update:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11h6M9 15h4"/></svg>',
+  new:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+  print:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7"/></svg>'
+};
+const ROUTES = [
+  ["portfolio","All sites","Sites"],
+  ["project","Morais Eden","Eden"],
+  ["schedule","Schedule","Schedule"],
+  ["update","Post site update","Update"],
+  ["new","New project","New"]
+];
+function renderNav(active){
+  $("#sideNav").innerHTML = ROUTES.map(([k,l]) =>
+    `<a href="#${k}" ${k===active?'aria-current="page"':""}>${ICONS[k]}<span>${l}</span></a>`).join("");
+  $("#bottomNav").innerHTML = ROUTES.map(([k,,s]) =>
+    `<a href="#${k}" ${k===active?'aria-current="page"':""}>${ICONS[k]}<span>${s}</span></a>`).join("");
+}
+
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2800);
+}
+function printPage(){ try { window.print(); } catch(e){ toast("Use your browser’s Print menu and choose Save as PDF."); } }
+
+/* ---------- View: portfolio ---------- */
+function viewPortfolio(){
+  const live = SITES.filter(s => !s.upcoming);
+  const ok = live.filter(s => s.delay <= 0).length;
+  const warn = live.filter(s => s.delay > 0 && s.delay <= 7).length;
+  const late = live.filter(s => s.delay > 7).length;
+  const behind = live.filter(s => s.delay > 0);
+  const avg = behind.length ? Math.round(behind.reduce((a,s) => a + s.delay, 0) / behind.length) : 0;
+  return `
+  <section class="glass intro" aria-label="Welcome">
+    <div class="intro-copy">
+      <span class="live"><i></i>Live from ${SITES.length} sites, as of ${fmt(TODAY)}</span>
+      <h1><span>Every site.</span><span>Every floor.</span><span>Every day.</span></h1>
+      <p class="sub">Progress Maker turns daily site reports into a live picture of planned against actual, so a delay shows up the day it happens, not at the month-end review.</p>
+      <div class="actions">
+        <a class="btn primary" href="#project">${ICONS.project}Open Morais Eden</a>
+        <a class="btn" href="#new">${ICONS.new}New project</a>
+        <button class="btn" type="button" data-print>${ICONS.print}Export PDF</button>
+      </div>
+      <div class="ticks">
+        <div class="tick"><b data-count="199">0</b><span>activities tracked in Eden</span></div>
+        <div class="tick"><b data-count="${CUR_DELAY}">0</b><span>days behind, every one explained</span></div>
+        <div class="tick"><b data-count="${DELAYS.length}">0</b><span>delay reasons logged from site</span></div>
+      </div>
+    </div>
+    <div class="intro-art">${sceneSVG()}</div>
+  </section>
+  ${tickerHTML()}
+
+  <section class="glass strip" aria-label="Summary">
+    <div class="stat"><b data-count="${SITES.length}">0</b><span>Projects</span></div>
+    <div class="stat ok"><b data-count="${ok}">0</b><span>On track or ahead</span></div>
+    <div class="stat warn"><b data-count="${warn}">0</b><span>Slipping, up to a week</span></div>
+    <div class="stat late"><b data-count="${late}">0</b><span>Delayed more than a week</span></div>
+    <div class="stat"><b><span data-count="${avg}">0</span> d</b><span>Average delay where late</span></div>
+  </section>
+
+  <section class="glass sites" aria-label="Sites">
+    <div class="sites-head">
+      <div>
+        <h2>Sites</h2>
+        <p class="hint" style="margin:0">The orange bar is work done. The blue tick is where the plan says it should be today.</p>
+      </div>
+      <span class="demo-note">Morais Eden uses its real schedule. Other sites are sample data.</span>
+    </div>
+    ${SITES.map(s => {
+      const [cls,label] = siteStatus(s);
+      return `<button class="site ${s.live?"featured":""}" type="button" data-site="${s.id}">
+        <span class="site-name"><b>${esc(s.name)}</b><small>${esc(s.type)}</small></span>
+        <span class="site-stage"><small>Current stage</small>${esc(s.stage)}</span>
+        <span class="site-prog"><span class="bar" style="--a:${s.actual}%;--p:${s.planned}%"><i></i><u></u></span><small>${s.actual}% done, plan says ${s.planned}%</small></span>
+        <span class="chip ${cls}">${label}</span>
+        <span class="site-ho"><small>Handover</small>${esc(s.handover)}</span>
+      </button>`;
+    }).join("")}
+  </section>`;
+}
+
+/* ---------- View: project ---------- */
+const FLOORS = [
+  ["Terrace",[72,87,94,101,121,148,null]],
+  ["5th floor",[61,86,93,100,120,147,169]],
+  ["4th floor",[50,85,92,99,119,146,168]],
+  ["3rd floor",[39,84,91,98,118,145,167]],
+  ["2nd floor",[28,83,90,97,117,144,166]],
+  ["1st floor",[17,82,89,96,116,143,165]],
+  ["Stilt floor",[7,null,null,null,null,null,null]],
+  ["Plinth & PCC",[3,null,null,null,null,null,null]]
+];
+const TRADES = ["Structure","Blockwork","Wall MEP","Plaster","Water­proofing","Tiling","Painting"];
+
+function towerHTML(){
+  // Highest floor whose structure is complete, by plan and by actual
+  let planIdx = -1, actIdx = -1;
+  for (let i = FLOORS.length - 1; i >= 0; i--){
+    const t = BY_ID[FLOORS[i][1][0]];
+    if (t.pPlan >= 1) planIdx = i;
+    if (t.pAct >= 1) actIdx = i;
+  }
+  let n = 0;
+  let html = `<div class="tower pre" id="tower"><div class="th">Floor</div>${TRADES.map(t => `<div class="th">${t}</div>`).join("")}`;
+  FLOORS.forEach(([fl, ids], i) => {
+    const tags = (i === planIdx ? '<span class="tag plan">Plan</span>' : "") + (i === actIdx ? '<span class="tag act">Actual</span>' : "");
+    html += `<div class="floor">${fl}${tags ? `<span class="tags">${tags}</span>` : ""}</div>`;
+    ids.forEach(id => {
+      if (id === null){ html += `<div class="cell none" aria-hidden="true"></div>`; return; }
+      const t = BY_ID[id];
+      const a = t.pAct, p = t.pPlan;
+      let cls = "idle";
+      if (a >= 1) cls = "done"; else if (p - a > 0.02) cls = "behind"; else if (a > 0) cls = "active";
+      const txt = a >= 1 ? "Done" : a > 0 ? Math.round(a * 100) + "%" : (cls === "behind" ? "0%" : "");
+      const tip = `${t.name}: planned ${fmt(t.s)} to ${fmt(t.f)}. ${a >= 1 ? "Finished" : "Expected to finish"} ${fmt(t.af)}. Plan today ${Math.round(p*100)}%, actual ${Math.round(a*100)}%.`;
+      html += `<div class="cell ${cls}" style="--f:${(a*100).toFixed(0)}%;--dly:${(n++ * 0.018).toFixed(3)}s" title="${esc(tip)}"><span>${txt}</span></div>`;
+    });
+  });
+  return html + "</div>";
+}
+
+function sCurveSVG(){
+  const W = 640, H = 270, L = 38, R = 12, TP = 14, B = 30;
+  const x0 = START, x1 = END + 14;
+  const X = d => L + (d - x0) / (x1 - x0) * (W - L - R);
+  const Y = p => TP + (1 - p) * (H - TP - B);
+  const path = pts => pts.map((p,i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join("");
+  const plan = [], act = [], fc = [];
+  for (let d = x0; d < END; d += 7) plan.push([d, planAt(d)]); plan.push([END, 1]);
+  for (let d = x0; d < TODAY; d += 7) act.push([d, actAt(d)]); act.push([TODAY, actAt(TODAY)]);
+  for (let d = TODAY; d < FORECAST_END; d += 7) fc.push([d, actAt(d)]); fc.push([FORECAST_END, 1]);
+  const ticks = [["01-11-26","Nov 26"],["01-02-27","Feb 27"],["01-05-27","May 27"],["01-08-27","Aug 27"],["01-11-27","Nov 27"],["01-02-28","Feb 28"]];
+  let g = "";
+  [0,.25,.5,.75,1].forEach(v => {
+    g += `<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--stroke)"/>`;
+    g += `<text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v*100}%</text>`;
+  });
+  ticks.forEach(([d,l]) => { g += `<text x="${X(D(d))}" y="${H-10}" text-anchor="middle">${l}</text>`; });
+  const tx = X(TODAY);
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Planned and actual cumulative progress over the project">
+    ${g}
+    <line x1="${tx}" x2="${tx}" y1="${TP}" y2="${H-B}" stroke="var(--late)" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <text x="${tx+6}" y="${TP+10}" style="fill:var(--late);font-weight:700">Today</text>
+    <path class="draw" pathLength="1" d="${path(plan)}" fill="none" stroke="var(--plan)" stroke-width="2.5"/>
+    <path class="late-in" d="${path(fc)}" fill="none" stroke="var(--act)" stroke-width="2.5" stroke-dasharray="6 5" opacity=".85"/>
+    <path class="draw d2" pathLength="1" d="${path(act)}" fill="none" stroke="var(--act)" stroke-width="3.5" stroke-linecap="round"/>
+    <circle class="pulse" cx="${tx}" cy="${Y(actAt(TODAY))}" r="5" fill="var(--act)" stroke="var(--glass-strong)" stroke-width="2"/>
+  </svg>`;
+}
+
+function milestonesHTML(){
+  const list = [
+    [13,"Stilt floor roof slab cast"],[24,"1st floor roof slab cast"],[35,"2nd floor roof slab cast"],
+    [46,"3rd floor roof slab cast"],[57,"4th floor roof slab cast"],[68,"5th floor roof slab cast"],
+    [72,"Terrace & overhead tank complete"],[134,"External plastering complete"],[199,"Handover"]
+  ];
+  let nextFound = false;
+  return `<ol class="ms">${list.map(([id,label], i) => {
+    const t = BY_ID[id];
+    const done = t.pAct >= 1;
+    let cls = done ? "done" : "";
+    if (!done && !nextFound){ cls = "next"; nextFound = true; }
+    const v = t.af - t.f;
+    const chip = v <= 0 ? `<span class="chip ok">On time</span>` : `<span class="chip ${done ? "late" : "warn"}">+${plural(v,"day")}</span>`;
+    return `<li class="${cls}">
+      <span class="dot">${done ? "✓" : i + 1}</span>
+      <div><b>${label}</b><small>Planned ${fmt(t.f)}</small></div>
+      <div class="right"><small>${done ? "Done" : "Expected"} ${fmt(t.af)}</small>${chip}</div>
+    </li>`;
+  }).join("")}</ol>`;
+}
+
+function delaysHTML(){
+  const sums = CATS.map(c => [c, DELAYS.filter(x => x.cat === c).reduce((a,x) => a + x.days, 0)]);
+  const total = sums.reduce((a,[,v]) => a + v, 0);
+  const max = Math.max(1, ...sums.map(([,v]) => v));
+  return `
+    <p class="hint">${plural(total,"day")} lost so far, logged by site engineers with a reason each time.</p>
+    ${sums.map(([c,v]) => `<div class="reason"><span>${c}</span><span class="bar" style="--a:${v/max*100}%"><i></i></span><b>${v} d</b></div>`).join("")}
+    <ul class="log">${DELAYS.map(x => `<li>
+      <p><strong>${esc(x.task)}</strong><br>${esc(x.note)}</p>
+      <span class="chip late">${plural(x.days,"day")}</span>
+      <span class="meta">${fmt(x.d)}, ${esc(x.cat)}</span>
+    </li>`).join("")}</ul>`;
+}
+
+function ganttHTML(){
+  const x0 = START, x1 = END + 14, span = x1 - x0 + 1;
+  const pos = d => ((d - x0) / span * 100).toFixed(3);
+  const wid = (a,b) => ((b - a + 1) / span * 100).toFixed(3);
+  let months = "";
+  for (let y = 2026, m = 10; y < 2028 || (y === 2028 && m <= 1); m++){
+    if (m > 11){ m = 0; y++; }
+    const d = Math.round(Date.UTC(y, m, 1) / 864e5);
+    if (d >= x0 && d <= x1){
+      const label = m === 0 ? `Jan ’${String(y).slice(2)}` : MON[m];
+      months += `<span class="g-month" style="left:${pos(d)}%">${label}</span>`;
+    }
+    if (y === 2028 && m === 1) break;
+  }
+  const rows = TASKS.filter(t => t.lv === 2 || t.lv === 3).map((t, idx) => {
+    const p = Math.round(t.pAct * 100);
+    const tip = `${t.name}: planned ${fmt(t.s)} to ${fmt(t.f)}, actual or forecast ${fmt(t.as)} to ${fmt(t.af)}, ${p}% done`;
+    return `<div class="g-row ${t.lv===2?"l2row":""}" style="--i:${idx}" title="${esc(tip)}">
+      <div class="g-label l${t.lv}">${esc(t.name)}</div>
+      <div class="g-track">
+        <span class="g-plan" style="left:${pos(t.s)}%;width:${wid(t.s,t.f)}%"></span>
+        <span class="g-act" style="left:${pos(t.as)}%;width:${wid(t.as,t.af)}%;--p:${p}%"></span>
+      </div>
+    </div>`;
+  }).join("");
+  return `<div class="gantt" style="--t:${((TODAY - x0) / span).toFixed(4)}">
+    <div class="g-row g-head"><div class="g-label"></div><div class="g-track">${months}</div></div>
+    ${rows}
+    <div class="g-today"><span>Today</span></div>
+  </div>`;
+}
+
+function crewSVG(){
+  const W = 640, H = 170, L = 30, B = 24, TP = 10, n = CREW.length;
+  const bw = (W - L - 8) / n;
+  const Y = v => TP + (1 - v / 100) * (H - TP - B);
+  let g = "";
+  [0,50,100].forEach(v => { g += `<line x1="${L}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--stroke)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`; });
+  CREW.forEach((v,i) => {
+    const x = L + 4 + i * bw;
+    const d = TODAY - (n - 1 - i);
+    g += `<rect x="${x+3}" y="${Y(85)}" width="${bw-6}" height="${Y(0)-Y(85)}" rx="4" fill="none" stroke="var(--plan)" stroke-width="1.2" stroke-dasharray="3 2"/>`;
+    g += `<rect x="${x+6}" y="${Y(v)}" width="${bw-12}" height="${Y(0)-Y(v)}" rx="3" fill="var(--act)"><title>${fmt(d)}: ${v} of 85 workers</title></rect>`;
+    if (i % 2 === 1 || i === n - 1) g += `<text x="${x + bw/2}" y="${H-6}" text-anchor="middle">${fmt(d,true)}</text>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Workers on site against planned crew for the last two weeks">${g}</svg>`;
+}
+
+function viewProject(){
+  const next = BY_ID[46];
+  const timeEl = (TODAY - START + 1) / (END - START + 1);
+  const crewToday = CREW[CREW.length - 1];
+  return `
+  <header class="page-head">
+    <div>
+      <h1>Morais Eden</h1>
+      <p class="sub">Stilt + 5 floors. Schedule revised on 31 Oct 2026, 199 activities over 15 months.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" type="button" data-print>${ICONS.print}Export PDF</button>
+      <a class="btn primary" href="#update">${ICONS.update}Post site update</a>
+    </div>
+  </header>
+
+  <section class="glass hero" aria-label="Project status">
+    <div class="hero-main">
+      <div class="hero-num"><b data-count="${CUR_DELAY}">0</b><span>days behind<br>plan</span></div>
+      <p>The <strong>3rd floor roof slab</strong> was due on ${fmt(next.f)}. At the current pace it will be cast on <strong>${fmt(next.af)}</strong>, which moves handover from ${fmt(END)} to <strong>${fmt(FORECAST_END)}</strong> unless the gap is recovered.</p>
+    </div>
+    <dl class="facts">
+      <div><dt>Work done</dt><dd><span data-count="${(PROJECT.pAct*100).toFixed(1)}" data-dec="${PROJECT.pAct*100<10?1:0}" data-suffix="%">0%</span><small>Plan for today: ${pctTxt(PROJECT.pPlan)}</small></dd>
+        <span class="bar" style="--a:${(PROJECT.pAct*100).toFixed(1)}%;--p:${(PROJECT.pPlan*100).toFixed(1)}%"><i></i><u></u></span></div>
+      <div><dt>Time used</dt><dd><span data-count="${Math.round(timeEl*100)}" data-suffix="%">0%</span><small>Day ${TODAY - START + 1} of ${END - START + 1}</small></dd>
+        <span class="bar" style="--a:${(timeEl*100).toFixed(1)}%;--p:0%"><i style="background:var(--plan)"></i></span></div>
+      <div><dt>Planned handover</dt><dd>${fmt(END)}<small>As per revised schedule</small></dd></div>
+      <div><dt>Forecast handover</dt><dd style="color:var(--late)">${fmt(FORECAST_END)}<small>If the delay is not recovered</small></dd></div>
+      <div><dt>Workers on site today</dt><dd>${crewToday} of 85<small>${85 - crewToday} short of the planned crew</small></dd></div>
+      <div><dt>Status as of</dt><dd>${fmt(TODAY)}<small>Last update by Karthik R</small></dd></div>
+    </dl>
+  </section>
+
+  ${roadHTML()}
+
+  <div class="grid2">
+    <section class="glass panel">
+      <h2>Floor by floor</h2>
+      <p class="hint">Each cell is one trade on one floor. Red outline means it is behind plan. Plan marks where the structure should be today; Actual marks where it is.</p>
+      <div class="scroll-x">${towerHTML()}</div>
+      <div class="legend">
+        <span><i class="sw box" style="background:color-mix(in srgb,var(--ok) 42%,transparent)"></i>Done</span>
+        <span><i class="sw box" style="background:color-mix(in srgb,var(--act) 55%,transparent)"></i>In progress</span>
+        <span><i class="sw box" style="box-shadow:inset 0 0 0 1.5px var(--late)"></i>Behind plan</span>
+        <span><i class="sw box" style="background:var(--track)"></i>Not started</span>
+      </div>
+    </section>
+    <section class="glass panel">
+      <h2>Planned against actual</h2>
+      <p class="hint">Cumulative work done across all 199 activities. Like a run chart in cricket, the gap between the lines is the delay.</p>
+      ${sCurveSVG()}
+      <div class="legend">
+        <span><i class="sw plan"></i>Planned</span>
+        <span><i class="sw act"></i>Actual</span>
+        <span><i class="sw fc"></i>Forecast at current pace</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="grid2">
+    <section class="glass panel">
+      <h2>Milestones</h2>
+      <p class="hint">Slab casts and key handover points from the schedule.</p>
+      ${milestonesHTML()}
+    </section>
+    <section class="glass panel">
+      <h2>Why we are late</h2>
+      ${delaysHTML()}
+    </section>
+  </div>
+
+  <section class="glass panel">
+    <h2>Phase timeline</h2>
+    <p class="hint">Blue outline is the planned window. Orange is actual or forecast, filled up to the work done so far.</p>
+    <div class="scroll-x">${ganttHTML()}</div>
+  </section>
+
+  <div class="grid2">
+    <section class="glass panel">
+      <h2>Latest site updates</h2>
+      <ul class="feed">${UPDATES.slice(0,5).map(u => `<li>
+        <div class="meta"><span>${fmt(u.d)}, ${esc(u.who)}</span><span class="crew">${u.crew[1]} of ${u.crew[0]} workers</span></div>
+        <p>${esc(u.text)}</p></li>`).join("")}</ul>
+    </section>
+    <section class="glass panel">
+      <h2>Crew on site</h2>
+      <p class="hint">Workers present each day against the planned crew of 85.</p>
+      ${crewSVG()}
+      <div class="legend"><span><i class="sw box" style="background:var(--act)"></i>Present</span><span><i class="sw box" style="border:1.2px dashed var(--plan)"></i>Planned</span></div>
+    </section>
+  </div>`;
+}
+
+/* ---------- View: schedule ---------- */
+let schedFilter = "all", schedQuery = "";
+function scheduleRows(){
+  const q = schedQuery.trim().toLowerCase();
+  let list = TASKS;
+  if (schedFilter !== "all" || q){
+    list = TASKS.filter(t => t.leaf);
+    if (schedFilter === "active") list = list.filter(t => t.pAct > 0 && t.pAct < 1);
+    if (schedFilter === "behind") list = list.filter(isBehind);
+    if (schedFilter === "ms") list = list.filter(t => t.ms);
+    if (q) list = list.filter(t => (t.name + " " + contextName(t)).toLowerCase().includes(q));
+  }
+  if (!list.length) return `<tr><td colspan="6" class="empty">No activities match. Try another filter or search term.</td></tr>`;
+  const flat = schedFilter !== "all" || q;
+  return list.map((t, rowI) => {
+    const st = status(t);
+    const v = t.af - t.f;
+    const future = st === "upcoming" || st === "late-start";
+    let chip;
+    if (st === "done") chip = v > 0 ? `<span class="chip late">+${v} d</span>` : `<span class="chip ok">On time</span>`;
+    else if (v > 0) chip = `<span class="chip warn">+${v} d forecast</span>`;
+    else chip = `<span class="chip ok">On time</span>`;
+    const ctx = flat && contextName(t) ? `<small>${esc(contextName(t))}</small>` : "";
+    const indent = flat ? 0 : Math.max(0, t.lv - 2) * 16;
+    const p = Math.round(t.pAct * 100);
+    return `<tr class="l${flat ? 4 : t.lv}" style="--i:${Math.min(rowI, 45)}">
+      <td class="name" style="padding-left:${10 + indent}px"><span class="id">${t.id}</span>${t.ms ? '<span class="ms-star" title="Milestone">◆</span>' : ""}${esc(t.name)}${ctx}</td>
+      <td class="dates">${fmt(t.s)} – ${fmt(t.f)}</td>
+      <td class="dates ${future ? "fc" : ""}" title="${future ? "Forecast" : "Actual"}">${fmt(t.as)} – ${fmt(t.af)}</td>
+      <td>${t.dur} d</td>
+      <td><div class="minibar"><span class="bar" style="--a:${p}%;--p:${(t.pPlan*100).toFixed(0)}%"><i></i><u></u></span><span>${p}%</span></div></td>
+      <td>${chip}</td>
+    </tr>`;
+  }).join("");
+}
+function viewSchedule(){
+  const f = [["all","Full schedule"],["active","In progress"],["behind","Behind plan"],["ms","Milestones"]];
+  return `
+  ${pageHero("Schedule", "All 199 activities from the Morais Eden revised schedule, with actual or forecast dates beside the plan.", artBlueprint(), `<button class="btn" type="button" data-print>${ICONS.print}Export PDF</button>`)}
+  <section class="glass panel">
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Filter">${f.map(([k,l]) => `<button type="button" data-filter="${k}" aria-pressed="${k===schedFilter}">${l}</button>`).join("")}</div>
+      <input class="search" type="search" id="schedSearch" placeholder="Search activities, e.g. plastering" value="${esc(schedQuery)}" aria-label="Search activities">
+    </div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Activity</th><th>Planned</th><th>Actual or forecast</th><th>Duration</th><th>Progress against plan</th><th>Variance</th></tr></thead>
+        <tbody id="schedBody">${scheduleRows()}</tbody>
+      </table>
+    </div>
+  </section>`;
+}
+
+/* ---------- View: site update (mobile-first) ---------- */
+function viewUpdate(){
+  const open = TASKS.filter(t => t.leaf && t.pAct < 1 && (t.pAct > 0 || t.pPlan > 0));
+  return `
+  ${pageHero("Site update", `Morais Eden, ${fmt(TODAY)}. Engineers post from the site on their phone, and head office sees it on the dashboard straight away. No more daily printouts.`, artSync())}
+  <div class="phone">
+    <form class="glass panel" id="updForm" novalidate>
+      <div class="field" style="margin-top:0">
+        <label for="updTask">Activity</label>
+        <select id="updTask">${open.map(t => `<option value="${t.id}">${esc(t.name)}${contextName(t) ? " (" + esc(contextName(t)) + ")" : ""}</option>`).join("")}</select>
+      </div>
+      <div class="field">
+        <div class="range-head"><label for="updProg">Work done</label><output id="updOut">0%</output></div>
+        <input type="range" id="updProg" min="0" max="100" step="5" value="0">
+      </div>
+      <div class="field row2">
+        <div><label for="crewPlan">Planned crew</label><input id="crewPlan" type="number" inputmode="numeric" min="0" value="85"></div>
+        <div><label for="crewAct">Workers present</label><input id="crewAct" type="number" inputmode="numeric" min="0" value="78"></div>
+      </div>
+      <div class="field">
+        <label class="switch" for="delayToggle"><span><b style="font-weight:620">Any delay today?</b><br><small style="color:var(--muted)">Record the reason so planning can act on it</small></span><input type="checkbox" id="delayToggle"></label>
+        <div class="delay-box" id="delayBox">
+          <span class="label" style="display:block;font-weight:620;font-size:14px;margin-bottom:8px">Reason</span>
+          <div class="choices">${CATS.map((c,i) => `<label><input type="radio" name="cat" value="${esc(c)}" ${i===0?"checked":""}><span>${c}</span></label>`).join("")}</div>
+          <div class="field"><label for="delayDays">Days lost</label><input id="delayDays" type="number" min="0.5" step="0.5" value="1"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="updNote">Remarks</label>
+        <textarea id="updNote" placeholder="What happened on site today?"></textarea>
+      </div>
+      <div class="field">
+        <label class="photo" for="updPhoto">${ICONS.new}<span id="photoTxt">Add site photos</span></label>
+        <input id="updPhoto" type="file" accept="image/*" multiple hidden>
+      </div>
+      <div class="form-actions">
+        <a class="btn" href="#project">Cancel</a>
+        <button class="btn primary" type="submit">Post update</button>
+      </div>
+    </form>
+  </div>`;
+}
+
+/* ---------- View: new project ---------- */
+function viewNew(){
+  return `
+  ${pageHero("New project", "Start from the standard template or upload the planning team’s Excel schedule. Every activity gets dated from the start date you pick.", artSheet())}
+  <div class="grid2">
+    <form class="glass panel" id="newForm" novalidate>
+      <h2>Project details</h2>
+      <div class="field"><label for="npName">Project name</label><input id="npName" required placeholder="e.g. Morais Grove"></div>
+      <div class="field"><label for="npType">Building type</label><input id="npType" value="Stilt + 5 floors"></div>
+      <div class="field">
+        <label for="npTpl">Schedule template</label>
+        <select id="npTpl"><option value="std">Standard stilt + 5 (from Morais Eden, 199 activities)</option></select>
+      </div>
+      <div class="field"><label for="npStart">Start date</label><input id="npStart" type="date" value="2027-06-01"></div>
+      <div class="field">
+        <span class="label" style="display:block;font-weight:620;font-size:14px;margin-bottom:6px">Or upload a schedule</span>
+        <label class="drop" id="drop" for="npFile">
+          <input id="npFile" type="file" accept=".xlsx,.xls,.csv,.mpp">
+          <b id="dropTitle">Choose an Excel or MS Project file</b>
+          <small id="dropSub">Columns needed: ID, task name, duration, start, finish</small>
+        </label>
+      </div>
+      <div class="form-actions"><button class="btn primary" type="submit">Create project</button></div>
+    </form>
+    <section class="glass panel" aria-live="polite" id="npPreview"></section>
+  </div>`;
+}
+function previewHTML(){
+  const v = $("#npStart") && $("#npStart").value;
+  const s = v ? fromISO(v) : fromISO("2027-06-01");
+  const off = s - START;
+  const leaves = LEAVES.length;
+  return `<h2>Preview</h2>
+    <p class="hint">${leaves} activities and ${MILESTONE_IDS.size} milestones will be created.</p>
+    <div class="row2" style="margin-bottom:12px">
+      <div><small style="color:var(--muted)">Start</small><div class="big-date">${fmt(s)}</div></div>
+      <div><small style="color:var(--muted)">Planned handover</small><div class="big-date">${fmt(END + off)}</div></div>
+    </div>
+    ${TASKS.filter(t => t.lv === 2).map((t, i) => `<div class="phase" style="--i:${i}"><b>${esc(t.name)}</b><small>${t.dur} days</small><small>${fmt(t.s + off)} to ${fmt(t.f + off)}</small></div>`).join("")}`;
+}
+
+/* ---------- Motion helpers ---------- */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function animateCounts(root){
+  root.querySelectorAll("[data-count]").forEach(el => {
+    const to = +el.dataset.count, dec = +(el.dataset.dec || 0), suf = el.dataset.suffix || "";
+    if (REDUCED){ el.textContent = to.toFixed(dec) + suf; return; }
+    const t0 = performance.now() + 250, dur = 1400;
+    const step = now => {
+      const k = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = (to * e).toFixed(dec) + suf;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+const TICKS = [
+  ["Morais Eden","3F roof slab steel fabrication completed"],
+  ["Lake View Towers","7th floor roof slab poured, 18 days behind"],
+  ["Green Meadows Villas","1 day ahead, final painting under way"],
+  ["Palm Residency","3rd floor plastering at 64%"],
+  ["Metro Business Park","Block delivery short, 12 days behind"],
+  ["Sunrise Homes","Snag list 80% closed"],
+  ["Orchid Enclave","Stilt floor columns cast on schedule"]
+];
+function tickerHTML(){
+  const items = TICKS.map(([a,b]) => `<span class="ticker-item"><b>${esc(a)}</b>${esc(b)}</span>`).join("");
+  return `<div class="glass ticker" aria-label="Latest from sites"><div class="ticker-track">${items}<span aria-hidden="true" style="display:contents">${items}</span></div></div>`;
+}
+function sceneSVG(){
+  const L = 170, R = 350, Wd = 180;
+  const f = c => `style="fill:${c}"`;
+  let s = `<svg class="scene" viewBox="0 0 560 380" role="img" aria-label="Morais Eden under construction: structure up to the 3rd floor, with the 4th and 5th floors shown as planned outlines">
+  <defs>
+    <radialGradient id="sunG"><stop offset="0" style="stop-color:var(--act);stop-opacity:.9"/><stop offset=".5" style="stop-color:var(--act);stop-opacity:.3"/><stop offset="1" style="stop-color:var(--act);stop-opacity:0"/></radialGradient>
+    <linearGradient id="scanG" x1="0" x2="1"><stop offset="0" style="stop-color:var(--plan);stop-opacity:0"/><stop offset=".5" style="stop-color:var(--plan);stop-opacity:1"/><stop offset="1" style="stop-color:var(--plan);stop-opacity:0"/></linearGradient>
+  </defs>
+  <circle class="sun" cx="92" cy="84" r="60" fill="url(#sunG)"/>
+  <g class="cloud"><ellipse cx="0" cy="66" rx="40" ry="11" ${f("var(--glass-strong)")}/><ellipse cx="18" cy="58" rx="22" ry="11" ${f("var(--glass-strong)")}/></g>
+  <g class="cloud c2"><ellipse cx="0" cy="128" rx="30" ry="8" ${f("var(--glass-strong)")}/><ellipse cx="12" cy="122" rx="16" ry="8" ${f("var(--glass-strong)")}/></g>`;
+  [[14,214,44,126],[62,252,34,88],[100,232,46,108],[388,268,34,72],[504,236,46,104]].forEach(([x,y,w,h]) => {
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" ${f("color-mix(in srgb,var(--plan) 16%,transparent)")}/>`;
+  });
+  s += `<rect x="0" y="340" width="560" height="40" ${f("color-mix(in srgb,var(--plan) 10%,transparent)")}/><line x1="0" x2="560" y1="340.5" y2="340.5" style="stroke:var(--stroke)"/>`;
+  const windows = (y, i) => { let w = ""; for (let k = 0; k < 6; k++) w += `<rect class="win" x="${L+13+k*27}" y="${y+12}" width="15" height="14" rx="2" style="fill:var(--act);fill-opacity:.22;--w:${(((i*6+k)*1.37) % 5).toFixed(2)}s"/>`; return w; };
+  const slab = (y, extra) => `<rect ${extra||""} x="${L-4}" y="${y}" width="${Wd+8}" height="5" rx="1.5" style="fill:var(--text);fill-opacity:.6"/>`;
+  const cols = (y, op) => { let c = ""; for (let k = 0; k < 6; k++) c += `<rect x="${(L+2+k*(Wd-12)/5).toFixed(1)}" y="${y}" width="8" height="29" style="fill:var(--text);fill-opacity:${op}"/>`; return c; };
+  const built = (y, i, d) => `<g class="fl" style="--d:${d}s"><rect x="${L}" y="${y}" width="${Wd}" height="34" rx="2" style="fill:var(--glass-strong);stroke:var(--stroke)"/>${windows(y,i)}${slab(y)}</g>`;
+  const scaf = x => { let g = `<line x1="${x}" y1="186" x2="${x}" y2="292"/><line x1="${x+8}" y1="186" x2="${x+8}" y2="292"/>`; for (let y = 186; y < 292; y += 17.6) g += `<line x1="${x}" y1="${y.toFixed(1)}" x2="${x+8}" y2="${y.toFixed(1)}"/><line x1="${x}" y1="${y.toFixed(1)}" x2="${x+8}" y2="${Math.min(292,y+17.6).toFixed(1)}"/>`; return g; };
+  s += `<g class="fl" style="--d:.1s"><rect x="${L-6}" y="326" width="${Wd+12}" height="14" rx="2" style="fill:var(--text);fill-opacity:.35"/></g>`;
+  s += `<g class="fl" style="--d:.25s">${cols(297,.45)}${slab(292)}</g>`;
+  s += built(258,1,.4) + built(224,2,.55);
+  s += `<g class="fl" style="--d:.7s">${cols(195,.4)}<rect class="shutter" x="${L-4}" y="190" width="${Wd+8}" height="5" rx="1.5" style="fill:var(--act)"/><g style="stroke:var(--plan);stroke-opacity:.75;stroke-width:1.1">${scaf(L-16)}${scaf(R+8)}</g></g>`;
+  s += `<g class="ghost" style="--d:1.1s"><rect x="${L}" y="156" width="${Wd}" height="34" rx="2" style="fill:none;stroke:var(--plan);stroke-width:1.3"/><rect x="${L}" y="122" width="${Wd}" height="34" rx="2" style="fill:none;stroke:var(--plan);stroke-width:1.3"/><rect x="${L+58}" y="100" width="64" height="22" rx="2" style="fill:none;stroke:var(--plan);stroke-width:1.3"/></g>`;
+  [["Terrace",115],["5F",143],["4F",177],["3F",211],["2F",245],["1F",279],["Stilt",313]].forEach(([t,y]) => { s += `<text x="${L-24}" y="${y}" text-anchor="end">${t}</text>`; });
+  s += `<rect class="scan" x="${L-20}" y="0" width="${Wd+40}" height="2.5" fill="url(#scanG)" transform="translate(0 -20)"/>`;
+  s += `<g class="marker"><line x1="${L-6}" x2="${R+20}" y1="190" y2="190" style="stroke:var(--plan);stroke-width:1.5;stroke-dasharray:4 3"/><rect x="${R+20}" y="181" width="44" height="18" rx="9" ${f("var(--plan)")}/><text x="${R+42}" y="194" text-anchor="middle" style="fill:var(--bg);font-weight:800">Plan</text></g>`;
+  s += `<g class="marker"><line x1="${L-6}" x2="${R+20}" y1="224" y2="224" style="stroke:var(--act);stroke-width:1.5;stroke-dasharray:4 3"/><rect x="${R+20}" y="215" width="52" height="18" rx="9" ${f("var(--act)")}/><text x="${R+46}" y="228" text-anchor="middle" style="fill:var(--on-act);font-weight:800">Actual</text></g>`;
+  let zz = ""; for (let y = 340, k = 0; y >= 44; y -= 14, k++) zz += `${k % 2 ? 474 : 462},${y} `;
+  s += `<g style="stroke:var(--text);stroke-opacity:.7;stroke-width:1.4;fill:none"><line x1="462" y1="340" x2="462" y2="40"/><line x1="474" y1="340" x2="474" y2="40"/><polyline points="${zz}"/><line x1="468" y1="40" x2="468" y2="12"/><line x1="468" y1="12" x2="246" y2="40"/><line x1="468" y1="12" x2="540" y2="40"/></g>`;
+  s += `<rect x="240" y="40" width="304" height="5" rx="1.5" ${f("var(--act)")}/><rect x="512" y="45" width="28" height="15" rx="2" style="fill:var(--text);fill-opacity:.55"/><rect x="474" y="45" width="15" height="13" rx="2" style="fill:var(--glass-strong);stroke:var(--text);stroke-opacity:.6"/><circle class="beacon" cx="468" cy="10" r="3.2" ${f("var(--late)")}/>`;
+  s += `<g class="trolley" transform="translate(292 0)"><rect x="-8" y="44" width="16" height="6" rx="2" style="fill:var(--text);fill-opacity:.75"/><g transform="translate(0 50)"><rect class="cable" x="-0.6" y="0" width="1.2" height="1" transform="scale(1 118)" style="fill:var(--text);fill-opacity:.7"/><g class="hook" transform="translate(0 118)"><rect x="-4" y="0" width="8" height="5" rx="1" ${f("var(--text)")}/><path d="M0 5 L-16 11 M0 5 L16 11" style="stroke:var(--text);stroke-width:1"/><rect x="-20" y="11" width="40" height="7" rx="1.5" ${f("var(--act)")}/></g></g></g>`;
+  return s + "</svg>";
+}
+
+/* ---------- Page illustrations ---------- */
+function pageHero(title, sub, art, actions){
+  return `<section class="glass page-hero"><div class="copy"><h1>${title}</h1><p class="sub">${sub}</p>${actions ? `<div class="actions" style="margin-top:18px">${actions}</div>` : ""}</div><div class="art">${art}</div></section>`;
+}
+function artBlueprint(){
+  let s = `<svg viewBox="0 0 420 220" role="img" aria-label="A building elevation being drawn next to timeline bars">
+  <defs><pattern id="bpg" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" style="fill:none;stroke:var(--plan);stroke-opacity:.16"/></pattern></defs>
+  <rect x="4" y="4" width="412" height="212" rx="14" fill="url(#bpg)" style="stroke:var(--stroke)"/>`;
+  s += `<path class="bp" pathLength="1" d="M40 196 V46 H170 V196 Z M40 171 H170 M40 146 H170 M40 121 H170 M40 96 H170 M40 71 H170 M88 46 V28 H122 V46 M72 196 V46 M138 196 V46"/>`;
+  s += `<path class="bp" pathLength="1" style="animation-delay:.4s" d="M26 46 V196 M22 46 H30 M22 196 H30"/><text x="18" y="125" text-anchor="middle" transform="rotate(-90 18 125)">Stilt + 5</text>`;
+  [[200,40,1],[214,52,1],[236,60,1],[262,48,.7],[290,58,.3],[318,64,0]].forEach(([x,w,p],i) => {
+    const y = 52 + i * 25;
+    s += `<rect x="${x}" y="${y}" width="${w}" height="8" rx="3" style="fill:none;stroke:var(--plan);stroke-width:1.3"/>`;
+    if (p > 0) s += `<rect class="lbar" x="${x}" y="${y+10}" width="${Math.round(w*p)}" height="7" rx="3" style="fill:var(--act);--d:${(i*0.25).toFixed(2)}s"/>`;
+  });
+  s += `<line class="blink-line" x1="300" x2="300" y1="36" y2="206" style="stroke:var(--late);stroke-width:2;stroke-dasharray:4 4"/><text x="305" y="32" style="fill:var(--late);font-weight:800">Today</text>`;
+  return s + "</svg>";
+}
+function artSync(){
+  let s = `<svg viewBox="0 0 420 220" role="img" aria-label="A site engineer’s phone sending the daily update to head office">`;
+  s += `<rect x="44" y="12" width="120" height="196" rx="20" style="fill:var(--glass-strong);stroke:var(--text);stroke-opacity:.5;stroke-width:1.5"/><rect x="86" y="20" width="36" height="6" rx="3" style="fill:var(--text);fill-opacity:.35"/>`;
+  s += `<rect x="58" y="36" width="92" height="20" rx="6" style="fill:var(--act)"/><text x="104" y="50" text-anchor="middle" style="fill:var(--on-act);font-weight:800">Daily update</text>`;
+  [0,1,2].forEach(i => {
+    const y = 78 + i * 28;
+    s += `<circle cx="68" cy="${y}" r="8" style="fill:none;stroke:var(--ok);stroke-width:2"/><path class="tickc" pathLength="1" d="M64 ${y} l3 3 l6 -6" style="fill:none;stroke:var(--ok);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;--d:${i*0.5}s"/><rect x="82" y="${y-4}" width="${[60,48,54][i]}" height="8" rx="4" style="fill:var(--text);fill-opacity:.18"/>`;
+  });
+  s += `<rect x="58" y="160" width="92" height="7" rx="3.5" style="fill:var(--track)"/><rect class="lbar" x="58" y="160" width="70" height="7" rx="3.5" style="fill:var(--act)"/>`;
+  s += `<rect class="glow" x="58" y="178" width="92" height="20" rx="8" style="fill:var(--plan)"/><text x="104" y="192" text-anchor="middle" style="fill:var(--bg);font-weight:800">Post update</text>`;
+  [16,30,44].forEach((r,i) => { s += `<path class="arc" d="M180 ${110-r} A ${r} ${r} 0 0 1 180 ${110+r}" style="fill:none;stroke:var(--plan);stroke-width:2.2;stroke-linecap:round;--d:${i*0.25}s"/>`; });
+  [0,0.8,1.6].forEach(d => { s += `<circle class="packet" cx="200" cy="110" r="4" style="fill:var(--act);--d:${d}s"/>`; });
+  s += `<rect x="300" y="58" width="84" height="134" rx="6" style="fill:var(--glass-strong);stroke:var(--text);stroke-opacity:.45;stroke-width:1.5"/>`;
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) s += `<rect class="win" x="${310+c*24}" y="${70+r*21}" width="16" height="12" rx="2" style="fill:var(--act);fill-opacity:.22;--w:${(((r*3+c)*0.9) % 5).toFixed(1)}s"/>`;
+  s += `<rect x="332" y="176" width="20" height="16" rx="2" style="fill:var(--text);fill-opacity:.4"/><text x="342" y="210" text-anchor="middle">Head office</text>`;
+  s += `<circle class="badge" cx="384" cy="58" r="11" style="fill:var(--late)"/><text x="384" y="62" text-anchor="middle" style="fill:#fff;font-weight:800;font-size:12px">1</text>`;
+  return s + "</svg>";
+}
+function artSheet(){
+  let s = `<svg viewBox="0 0 420 220" role="img" aria-label="An Excel schedule being turned into project timeline bars">`;
+  s += `<rect x="20" y="28" width="150" height="166" rx="10" style="fill:var(--glass-strong);stroke:var(--text);stroke-opacity:.4;stroke-width:1.4"/><path d="M20 38 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v14 h-150z" style="fill:color-mix(in srgb,var(--ok) 45%,transparent)"/><text x="32" y="45" style="fill:var(--text);font-weight:800">schedule.xlsx</text>`;
+  for (let r = 1; r < 7; r++) s += `<line x1="20" x2="170" y1="${52+r*22}" y2="${52+r*22}" style="stroke:var(--stroke)"/>`;
+  s += `<line x1="58" x2="58" y1="52" y2="194" style="stroke:var(--stroke)"/><line x1="118" x2="118" y1="52" y2="194" style="stroke:var(--stroke)"/>`;
+  for (let r = 0; r < 6; r++) s += `<rect x="26" y="${60+r*22}" width="24" height="6" rx="3" style="fill:var(--text);fill-opacity:.12"/><rect x="64" y="${60+r*22}" width="${[44,36,48,30,40,34][r]}" height="6" rx="3" style="fill:var(--text);fill-opacity:.2"/><rect x="124" y="${60+r*22}" width="38" height="6" rx="3" style="fill:var(--text);fill-opacity:.12"/>`;
+  s += `<rect class="rowscan" x="21" y="52" width="148" height="22" style="fill:var(--act);fill-opacity:.25"/>`;
+  s += `<line class="flowline" x1="182" x2="236" y1="111" y2="111" style="stroke:var(--plan);stroke-width:2.4"/><path d="M234 103 l9 8 l-9 8" style="fill:none;stroke:var(--plan);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"/>`;
+  s += `<rect x="252" y="28" width="150" height="166" rx="10" style="fill:var(--glass-strong);stroke:var(--text);stroke-opacity:.4;stroke-width:1.4"/><text x="264" y="47" style="fill:var(--text);font-weight:800">Project timeline</text>`;
+  [[264,30],[282,40],[300,46],[324,34],[338,42],[356,34]].forEach(([x,w],i) => { s += `<rect class="lbar" x="${x}" y="${62+i*21}" width="${w}" height="9" rx="4" style="fill:${i%2 ? "var(--plan)" : "var(--act)"};--d:${(i*0.22).toFixed(2)}s"/>`; });
+  [[198,60],[226,168],[408,20],[240,38]].forEach(([x,y],i) => { s += `<g transform="translate(${x} ${y})"><path class="twinkle" d="M0 -7 L1.8 -1.8 L7 0 L1.8 1.8 L0 7 L-1.8 1.8 L-7 0 L-1.8 -1.8Z" style="fill:var(--act);--d:${i*0.5}s"/></g>`; });
+  return s + "</svg>";
+}
+function roadHTML(){
+  const w0 = TODAY - 55, w1 = TODAY + 80;
+  const X = d => 40 + (d - w0) / (w1 - w0) * 920;
+  const xT = X(TODAY - CUR_DELAY), xP = X(TODAY);
+  let s = `<svg class="road" viewBox="0 0 1000 190" role="img" aria-label="Road view: the site is ${CUR_DELAY} days behind where the schedule says it should be today"><defs><clipPath id="drumClip"><ellipse cx="-58" cy="-30" rx="29" ry="15"/></clipPath></defs>`;
+  for (let m = 1; m < 12; m++){
+    const d = Math.round(Date.UTC(2027, m, 1) / 864e5);
+    if (d > w0 && d < w1){ const x = X(d); s += `<line x1="${x}" x2="${x}" y1="146" y2="154" style="stroke:var(--muted)"/><text x="${x+5}" y="184">${MON[m]} 2027</text>`; }
+  }
+  s += `<rect x="0" y="110" width="1000" height="36" style="fill:color-mix(in srgb,var(--text) 12%,transparent)"/><line x1="0" x2="1000" y1="110" y2="110" style="stroke:var(--stroke)"/><line x1="0" x2="1000" y1="146" y2="146" style="stroke:var(--stroke)"/><line class="road-dash" x1="0" x2="1000" y1="128" y2="128" style="stroke:var(--glass-strong);stroke-width:3"/>`;
+  s += `<rect class="gap" x="${xT.toFixed(1)}" y="111" width="${(xP-xT).toFixed(1)}" height="34" style="fill:color-mix(in srgb,var(--late) 24%,transparent)"/><text class="gap-label" x="${((xT+xP)/2).toFixed(1)}" y="166" text-anchor="middle" style="fill:var(--late);font-weight:800;font-size:13px">${CUR_DELAY} days</text>`;
+  const ids = [35,46,57,68], labs = ["2F slab","3F slab","4F slab","5F slab"];
+  ids.forEach((id, i) => {
+    const t = BY_ID[id], x = X(t.f);
+    if (x < 20 || x > 980) return;
+    const done = t.pAct >= 1, next = !done && (i === 0 || BY_ID[ids[i-1]].pAct >= 1);
+    const col = done ? "var(--ok)" : next ? "var(--act)" : "var(--muted)";
+    const sub = done ? `Cast ${fmt(t.af,true)}` : next ? `Due ${fmt(t.f,true)}` : `Plan ${fmt(t.f,true)}`;
+    s += `<line x1="${x}" x2="${x}" y1="44" y2="110" style="stroke:${col};stroke-width:2"/><path class="flag" d="M${x} 44 h30 l-7 8 l7 8 h-30z" style="fill:${col};--d:${i*0.3}s"/><text x="${x}" y="18" text-anchor="middle" style="fill:var(--text);font-weight:750;font-size:13px">${labs[i]}</text><text x="${x}" y="35" text-anchor="middle">${sub}</text>`;
+  });
+  s += `<g transform="translate(${xP.toFixed(1)} 122)"><g class="pin"><path d="M0 0 C-11 -13 -11 -28 0 -28 C11 -28 11 -13 0 0Z" style="fill:var(--plan)"/><circle cx="0" cy="-18" r="4.5" style="fill:var(--bg)"/><rect x="-30" y="-54" width="60" height="18" rx="9" style="fill:var(--plan)"/><text x="0" y="-41" text-anchor="middle" style="fill:var(--bg);font-weight:800;font-size:11.5px">Plan</text></g></g>`;
+  let stripes = ""; for (let k = -110; k < 0; k += 14) stripes += `<line x1="${k}" y1="-48" x2="${k+10}" y2="-12" style="stroke:var(--act);stroke-width:4;stroke-opacity:.85"/>`;
+  s += `<g class="truck" style="transform:translateX(${xT.toFixed(1)}px)"><g transform="translate(0 144)"><g class="truck-body">
+    ${[0,.55,1.1].map(d => `<circle class="puff" cx="-30" cy="-52" r="4" style="fill:var(--muted);--d:${d}s"/>`).join("")}
+    <rect x="-32" y="-52" width="4" height="12" rx="1" style="fill:var(--text);fill-opacity:.6"/>
+    <rect x="-94" y="-16" width="94" height="6" rx="2" style="fill:var(--text);fill-opacity:.75"/>
+    <ellipse cx="-58" cy="-30" rx="30" ry="16" style="fill:var(--glass-strong);stroke:var(--text);stroke-opacity:.6;stroke-width:1.4"/>
+    <g clip-path="url(#drumClip)"><g class="stripes">${stripes}</g></g>
+    <path d="M-26 -16 V-36 Q-26 -40 -22 -40 H-8 L0 -28 V-16 Z" style="fill:var(--act)"/>
+    <path d="M-21 -36 H-10 L-5 -28 H-21 Z" style="fill:color-mix(in srgb,var(--plan) 55%,var(--glass-strong))"/>
+    <line x1="-92" y1="-24" x2="-102" y2="-12" style="stroke:var(--text);stroke-width:3;stroke-linecap:round;stroke-opacity:.7"/>
+    <rect x="-82" y="-82" width="64" height="18" rx="9" style="fill:var(--act)"/><text x="-50" y="-69" text-anchor="middle" style="fill:var(--on-act);font-weight:800;font-size:11.5px">Actual</text>
+  </g>
+  ${[-78,-52,-14].map(cx => `<g class="wheel"><circle cx="${cx}" cy="-8" r="8" style="fill:var(--text)"/><circle cx="${cx}" cy="-8" r="3" style="fill:var(--glass-strong)"/><line x1="${cx}" y1="-15" x2="${cx}" y2="-11" style="stroke:var(--glass-strong);stroke-width:2"/></g>`).join("")}
+  </g></g></svg>`;
+  return `<section class="glass panel"><h2>On the road to handover</h2><p class="hint">Zoomed to the months around today. The mixer truck is where the site actually is, the blue pin is where the schedule says it should be, and the red stretch between them is the delay.</p><div class="scroll-x"><div style="min-width:720px">${s}</div></div></section>`;
+}
+function celebrate(msg, then){
+  const o = document.createElement("div");
+  o.className = "celebrate";
+  o.setAttribute("role", "status");
+  const cols = ["var(--act)","var(--plan)","var(--ok)","var(--late)"];
+  let conf = "";
+  for (let i = 0; i < 26; i++){
+    const a = (i / 26) * Math.PI * 2, r = 120 + (i % 5) * 28;
+    conf += `<i class="confetti" style="--x:${Math.round(Math.cos(a)*r)}px;--y:${Math.round(Math.sin(a)*r)}px;--r:${(i*47)%360}deg;--c:${cols[i%4]}"></i>`;
+  }
+  o.innerHTML = `${REDUCED ? "" : conf}<div class="cel-card glass"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="cel-ring" cx="40" cy="40" r="34" pathLength="1"/><path class="cel-tick" d="M24 41 l11 11 l22 -24" pathLength="1"/></svg><b>${esc(msg)}</b></div>`;
+  document.body.appendChild(o);
+  setTimeout(() => { o.classList.add("out"); if (then) then(); setTimeout(() => o.remove(), 400); }, REDUCED ? 700 : 1500);
+}
+
+/* ---------- View: login ---------- */
+function flyHTML(){
+  const C = 12, L = 440, W = 170;
+  const levels = [
+    {y:420, h:40, stilt:true}, {y:380}, {y:340}, {y:300}, {y:260}, {y:220},
+    {y:196, h:24, x:490, w:70, head:true}
+  ];
+  let css = "", floors = "", sparks = "";
+  levels.forEach((lv, i) => {
+    const a = 4 + i * 6.5;
+    css += `.fl${i}{animation:fl${i} ${C}s linear infinite}@keyframes fl${i}{0%,${a}%{opacity:0;transform:translateY(-50px)}${(a+2.2).toFixed(1)}%{opacity:1;transform:translateY(5px)}${(a+3.6).toFixed(1)}%,93%{opacity:1;transform:translateY(0)}98%,100%{opacity:0;transform:translateY(0)}}`;
+    css += `.sp${i}{transform-box:fill-box;transform-origin:center;animation:sp${i} ${C}s linear infinite}@keyframes sp${i}{0%,${(a+2).toFixed(1)}%{opacity:0;transform:scale(.2)}${(a+2.5).toFixed(1)}%{opacity:1;transform:scale(.7)}${(a+5).toFixed(1)}%,100%{opacity:0;transform:scale(1.6)}}`;
+    css += `.lw${i}{animation:lw${i} ${C}s ease-in-out infinite}@keyframes lw${i}{0%,${54+i*2}%{fill-opacity:.1}${57+i*2}%,92%{fill-opacity:.95}97%,100%{fill-opacity:.1}}`;
+    const x = lv.x ?? L, w = lv.w ?? W, h = lv.h ?? 40;
+    let g = `<g class="fl${i}">`;
+    if (lv.stilt){
+      for (let k = 0; k < 6; k++) g += `<rect x="${(x+4+k*((w-16)/5)).toFixed(1)}" y="${lv.y+5}" width="8" height="${h-5}" fill="#454b66"/>`;
+    } else {
+      g += `<rect x="${x}" y="${lv.y}" width="${w}" height="${h}" fill="url(#bodyG)"/>`;
+      if (!lv.head) for (let k = 0; k < 5; k++) g += `<rect class="lw${i}" x="${x+12+k*31}" y="${lv.y+12}" width="20" height="20" rx="2" fill="#ffd27a" fill-opacity=".1"/>`;
+    }
+    g += `<rect x="${x-5}" y="${lv.y}" width="${w+10}" height="5" rx="1.5" fill="#e4e7f0"/></g>`;
+    floors += g;
+    let rays = "";
+    for (let r = 0; r < 8; r++){ const an = r * Math.PI / 4; rays += `<line x1="0" y1="0" x2="${(Math.cos(an)*15).toFixed(1)}" y2="${(Math.sin(an)*15).toFixed(1)}"/>`; }
+    sparks += `<g transform="translate(${x + w - 4} ${lv.y + 2})"><g class="sp${i}" opacity="0" style="stroke:#ffd166;stroke-width:2.2;stroke-linecap:round">${rays}</g></g>`;
+  });
+
+  let fw = "";
+  [[360,110,83,"#ffb020"],[720,80,86,"#7fb2e5"],[640,190,89,"#ff6b6e"],[420,60,91,"#3dd68c"]].forEach(([x,y,p,c], j) => {
+    css += `.fw${j}{transform-box:fill-box;transform-origin:center;animation:fw${j} ${C}s ease-out infinite}@keyframes fw${j}{0%,${p}%{opacity:0;transform:scale(.15)}${p+0.6}%{opacity:1}${p+5}%,100%{opacity:0;transform:scale(1.35)}}`;
+    let dots = "";
+    for (let k = 0; k < 16; k++){ const an = k * Math.PI * 2 / 16; dots += `<circle cx="${(Math.cos(an)*36).toFixed(1)}" cy="${(Math.sin(an)*36).toFixed(1)}" r="2.6" fill="${c}"/>`; }
+    fw += `<g transform="translate(${x} ${y})"><g class="fw${j}" opacity="0">${dots}</g></g>`;
+  });
+
+  const strip = (seed, baseY, minH, maxH, col, wins) => {
+    let s = "", x = 0, k = seed;
+    while (x < 800){
+      const w = 34 + (k * 23) % 46, h = minH + (k * 37) % (maxH - minH);
+      if (x + w > 796) break;
+      s += `<rect x="${x}" y="${baseY - h}" width="${w}" height="${h}" fill="${col}"/>`;
+      if (wins) for (let r = 0; r < Math.floor((h - 12) / 14); r++) for (let c = 0; c < Math.floor((w - 8) / 10); c++)
+        if ((r * 5 + c * 3 + k) % 4 === 0) s += `<rect class="cw" x="${x + 5 + c * 10}" y="${baseY - h + 8 + r * 14}" width="4" height="6" fill="#ffd27a" style="animation-delay:-${((r + c + k) % 7) * 0.15}s"/>`;
+      x += w + 4 + (k * 11) % 14; k++;
+    }
+    return s;
+  };
+  const tile = (cls, inner) => `<g class="${cls}">${inner}<g transform="translate(800 0)">${inner}</g></g>`;
+  const far = strip(3, 470, 70, 190, "#3a4068", false);
+  const mid = strip(8, 470, 40, 130, "#232842", true);
+  let near = "";
+  for (let k = 0; k < 4; k++){
+    const x = 60 + k * 200;
+    near += `<line x1="${x}" y1="600" x2="${x}" y2="500" stroke="#0c101c" stroke-width="5"/><path d="M${x} 500 q0 -10 14 -10" fill="none" stroke="#0c101c" stroke-width="4"/><circle class="night-on" cx="${x+16}" cy="492" r="14" fill="#ffd27a" opacity="0" style="filter:blur(4px)"/><circle cx="${x+16}" cy="492" r="4" fill="#ffe3a3"/>`;
+    near += `<ellipse cx="${x+100}" cy="598" rx="46" ry="16" fill="#0c101c"/><ellipse cx="${x+130}" cy="600" rx="30" ry="12" fill="#0c101c"/>`;
+  }
+  let stars = "";
+  for (let k = 0; k < 40; k++) stars += `<circle class="tw" cx="${(k * 97) % 800}" cy="${(k * 53) % 300}" r="${1 + (k % 3) * 0.5}" fill="#fff" style="animation-delay:-${(k % 8) * 0.2}s"/>`;
+  const cloud = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})" fill="#fff" fill-opacity=".5"><ellipse cx="0" cy="0" rx="46" ry="13"/><ellipse cx="18" cy="-9" rx="24" ry="13"/><ellipse cx="-16" cy="-5" rx="18" ry="10"/></g>`;
+  const clouds = cloud(120, 90, 1) + cloud(420, 150, .7) + cloud(640, 70, .9);
+  const car = (y, dir, col, t, dl) => {
+    const body = `<rect x="-22" y="-16" width="44" height="12" rx="4" fill="${col}"/><rect x="-11" y="-25" width="20" height="11" rx="3" fill="${col}"/><rect x="-8" y="-23" width="14" height="7" rx="1.5" fill="#9cc8f2" fill-opacity=".7"/><circle cx="-12" cy="-3" r="4.5" fill="#0c101c"/><circle cx="12" cy="-3" r="4.5" fill="#0c101c"/><polygon class="night-on" points="22,-12 70,-20 70,0" fill="#ffe3a3" opacity="0" fill-opacity=".35"/><circle cx="21" cy="-11" r="2.2" fill="#ffe3a3"/>`;
+    return `<g transform="translate(0 ${y})"><g class="${dir === "R" ? "carR" : "carL"}" style="--t:${t}s;--dl:${dl}s"><g ${dir === "L" ? 'transform="scale(-1 1)"' : ""}>${body}</g></g></g>`;
+  };
+  let zz = ""; for (let y = 470, n = 0; y >= 144; y -= 14, n++) zz += `${n % 2 ? 688 : 676},${y} `;
+
+  const svg = `<svg class="fly-scene" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="gNight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050a1e"/><stop offset=".75" stop-color="#1a2650"/></linearGradient>
+    <linearGradient id="gDusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1f4f"/><stop offset=".5" stop-color="#8a4a6b"/><stop offset=".78" stop-color="#ff8a5c"/></linearGradient>
+    <linearGradient id="gDay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d7fd6"/><stop offset=".55" stop-color="#9cc8f2"/><stop offset=".78" stop-color="#ffe3b8"/></linearGradient>
+    <linearGradient id="gDawn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#24305c"/><stop offset=".5" stop-color="#b5728a"/><stop offset=".78" stop-color="#ffb27a"/></linearGradient>
+    <linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3c9d9"/><stop offset="1" stop-color="#8e96ad"/></linearGradient>
+    <radialGradient id="sunG"><stop offset="0" stop-color="#fff6dc"/><stop offset=".55" stop-color="#ffd27a"/><stop offset="1" stop-color="#ff9a5a"/></radialGradient>
+    <radialGradient id="haloG"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#gNight)"/>
+  <rect class="skyD" width="800" height="600" fill="url(#gDusk)"/>
+  <rect class="skyY" width="800" height="600" fill="url(#gDay)"/>
+  <rect class="skyA" width="800" height="600" fill="url(#gDawn)"/>
+  <g class="stars" opacity="0">${stars}</g>
+  <g class="sunarc"><circle cx="400" cy="140" r="80" fill="url(#haloG)"/><circle cx="400" cy="140" r="30" fill="url(#sunG)"/></g>
+  <g class="moonarc" opacity="0"><circle cx="400" cy="150" r="20" fill="#f2f0e6"/><circle cx="410" cy="144" r="18" fill="#1a2650"/></g>
+  ${tile("cloudL", clouds)}
+  <g class="birds"><g transform="translate(0 110)" fill="none" stroke="#1b2233" stroke-width="2" stroke-linecap="round"><path class="wing" d="M0 0 q6 -6 12 0 q6 -6 12 0"/><path class="wing" d="M30 14 q5 -5 10 0 q5 -5 10 0" style="animation-delay:-.15s"/><path class="wing" d="M-24 18 q5 -5 10 0 q5 -5 10 0" style="animation-delay:-.25s"/></g></g>
+  ${fw}
+  ${tile("px1", far)}
+  ${tile("px2", mid)}
+  <g class="ghostb" fill="none" stroke="#7fb2e5" stroke-width="1.4"><rect x="440" y="220" width="170" height="240"/><rect x="490" y="196" width="70" height="24"/></g>
+  <rect x="434" y="460" width="182" height="10" rx="2" fill="#6b7290"/>
+  ${floors}
+  ${sparks}
+  <g class="crane">
+    <g fill="none" stroke="#e4e7f0" stroke-opacity=".85" stroke-width="1.6"><line x1="676" y1="470" x2="676" y2="144"/><line x1="688" y1="470" x2="688" y2="144"/><polyline points="${zz}"/></g>
+    <g class="cjib" style="transform-origin:682px 140px">
+      <g fill="none" stroke="#e4e7f0" stroke-opacity=".85" stroke-width="1.6"><line x1="682" y1="140" x2="682" y2="110"/><line x1="682" y1="110" x2="474" y2="137"/><line x1="682" y1="110" x2="776" y2="137"/></g>
+      <rect x="470" y="137" width="310" height="6" rx="2" fill="#ffb020"/>
+      <rect x="746" y="143" width="30" height="16" rx="2" fill="#454b66"/>
+      <rect x="688" y="143" width="16" height="14" rx="2" fill="#e4e7f0"/>
+      <g transform="translate(540 143)"><rect class="ccable" x="-0.8" y="0" width="1.6" height="50" fill="#e4e7f0"/><g class="cload"><rect x="-24" y="50" width="48" height="8" rx="1.5" fill="#ffb020"/></g></g>
+    </g>
+    <circle class="cbeacon" cx="682" cy="106" r="3.4" fill="#ff5a5f"/>
+  </g>
+  <g class="handover" opacity="0"><rect x="460" y="150" width="130" height="30" rx="15" fill="#3DD68C"/><text x="525" y="170" text-anchor="middle" font-size="14" font-weight="800" fill="#062414" font-family="Archivo, system-ui, sans-serif">Handed over</text></g>
+  <rect y="470" width="800" height="130" fill="#161c2c"/>
+  <rect y="510" width="800" height="50" fill="#0f1422"/>
+  <line x1="0" x2="800" y1="510" y2="510" stroke="#2a3248"/>
+  <line class="roaddash" x1="0" x2="800" y1="535" y2="535" stroke="#e4e7f0" stroke-opacity=".7" stroke-width="2.5" stroke-dasharray="18 14"/>
+  ${car(530, "R", "#ffb020", 3.6, 0)}${car(530, "R", "#7fb2e5", 3.6, -1.8)}${car(556, "L", "#ff6b6e", 2.9, -0.7)}${car(556, "L", "#e4e7f0", 2.9, -2.1)}
+  ${tile("px3", near)}
+  <style>${css}</style>
+</svg>`;
+
+  return `<section class="fly" aria-label="Animated time-lapse of a Morais building going up, from structure to finishing to handover">
+    ${svg}
+    <div class="fly-vig"></div>
+    <div class="fly-top"><span class="fly-chip">Morais Developers</span><span class="fly-chip"><i></i>Live site view</span></div>
+    <div class="fly-copy">
+      <h2>Build it on time, floor by floor.</h2>
+    </div>
+    <div class="fly-bottom">
+      <div class="fly-cap">
+        <span class="cap-a">Structure: columns, beams and slabs, tracked floor by floor against the plan.</span>
+        <span class="cap-b">Finishing: plaster, tiles and lights, checked room by room as the site reports in.</span>
+        <span class="cap-c">Handover: every home delivered on the date promised to the buyer.</span>
+      </div>
+      <div class="fly-steps" aria-hidden="true">
+        <div>Structure<i style="--an:st1"></i></div>
+        <div>Finishing<i style="--an:st2"></i></div>
+        <div>Handover<i style="--an:st3"></i></div>
+      </div>
+    </div>
+  </section>`;
+}
+function viewLogin(){
+  return `<div class="auth-wrap">
+  ${flyHTML()}
+  <section class="glass auth-card" aria-label="Sign in">
+    <div class="brand" style="padding:0 0 22px">
+      <svg class="brand-mark" viewBox="0 0 34 34" aria-hidden="true"><rect x="2" y="2" width="30" height="30" rx="9" style="fill:var(--act)"/><path d="M9 25V15M14 25V11M19 25V17M24 25V8" style="stroke:var(--on-act);stroke-width:3;stroke-linecap:round"/></svg>
+      <div><b>Progress Maker</b><small>Morais Developers</small></div>
+    </div>
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="sub">Sign in to see where every site stands today.</p>
+    <form id="loginForm" novalidate>
+      <div class="field"><span class="label">I am signing in as</span>
+        <div class="seg role-seg" role="group" aria-label="Role">
+          <button type="button" data-role="owner" aria-pressed="true">Owner</button>
+          <button type="button" data-role="planning" aria-pressed="false">Planning</button>
+          <button type="button" data-role="site" aria-pressed="false">Site engineer</button>
+        </div>
+      </div>
+      <div class="field" id="emailField"><label for="lgEmail">Email or employee ID</label><input id="lgEmail" type="text" autocomplete="username" placeholder="name@company.com"><p class="err">Enter your email or employee ID.</p></div>
+      <div class="field" id="passField"><label for="lgPass">Password</label><div class="pw"><input id="lgPass" type="password" autocomplete="current-password" placeholder="Your password"><button type="button" id="pwToggle" aria-label="Show password">Show</button></div><p class="err">Enter your password.</p></div>
+      <div class="row-between"><label class="check"><input type="checkbox" id="rememberMe" checked>Keep me signed in</label><a href="#login" id="forgotLink">Forgot password?</a></div>
+      <button class="btn primary block" id="signInBtn" type="submit">Sign in</button>
+      <div class="or">or</div>
+      <button class="btn block" type="button" id="ssoBtn">Sign in with company account</button>
+      <p class="demo-note" style="margin:18px 0 0">Demo: any email and password will sign you in. Owners land on all sites, planning on the schedule, and site engineers on the daily update.</p>
+    </form>
+  </section>
+  </div>`;
+}
+
+/* ---------- Router ---------- */
+const VIEWS = {login:viewLogin, portfolio:viewPortfolio, project:viewProject, schedule:viewSchedule, update:viewUpdate, new:viewNew};
+function route(){
+  let key = (location.hash || "").replace("#","");
+  if (!VIEWS[key]) key = location.hash ? "portfolio" : "login";
+  document.body.classList.toggle("auth", key === "login");
+  renderNav(key);
+  const v = $("#view");
+  v.innerHTML = VIEWS[key]();
+  Array.from(v.children).forEach((c, i) => c.style.setProperty("--n", i));
+  window.scrollTo(0,0);
+  bind(key);
+  animateCounts(v);
+  v.querySelectorAll(".feed, .log, .ms").forEach(list => Array.from(list.children).forEach((c, i) => c.style.setProperty("--i", i)));
+}
+function bind(key){
+  document.querySelectorAll("[data-print]").forEach(b => b.addEventListener("click", printPage));
+  if (key === "login"){
+    let role = "owner";
+    document.querySelectorAll("[data-role]").forEach(b => b.addEventListener("click", () => {
+      role = b.dataset.role;
+      document.querySelectorAll("[data-role]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    }));
+    $("#pwToggle").addEventListener("click", () => {
+      const p = $("#lgPass"), show = p.type === "password";
+      p.type = show ? "text" : "password";
+      $("#pwToggle").textContent = show ? "Hide" : "Show";
+      $("#pwToggle").setAttribute("aria-label", show ? "Hide password" : "Show password");
+    });
+    $("#forgotLink").addEventListener("click", e => { e.preventDefault(); toast("Demo: a password reset link would be emailed to you."); });
+    $("#ssoBtn").addEventListener("click", () => toast("Demo: company single sign-on connects in the full version."));
+    ["lgEmail","lgPass"].forEach(id => $("#" + id).addEventListener("input", e => e.target.closest(".field").classList.remove("invalid")));
+    $("#loginForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const em = $("#lgEmail"), pw = $("#lgPass");
+      const badE = !em.value.trim(), badP = !pw.value.trim();
+      $("#emailField").classList.toggle("invalid", badE);
+      $("#passField").classList.toggle("invalid", badP);
+      if (badE || badP){ (badE ? em : pw).focus(); return; }
+      const btn = $("#signInBtn");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Signing in';
+      setTimeout(() => {
+        location.hash = role === "planning" ? "schedule" : role === "site" ? "update" : "portfolio";
+        toast("Signed in. Welcome back.");
+      }, REDUCED ? 200 : 1100);
+    });
+  }
+  if (key === "portfolio"){
+    document.querySelectorAll("[data-site]").forEach(b => b.addEventListener("click", () => {
+      if (b.dataset.site === "eden") location.hash = "project";
+      else toast("Sample site. Open Morais Eden to see the full drill-down.");
+    }));
+  }
+  if (key === "project"){
+    const tw = $("#tower");
+    requestAnimationFrame(() => requestAnimationFrame(() => tw && tw.classList.remove("pre")));
+  }
+  if (key === "schedule"){
+    document.querySelectorAll("[data-filter]").forEach(b => b.addEventListener("click", () => {
+      schedFilter = b.dataset.filter;
+      document.querySelectorAll("[data-filter]").forEach(x => x.setAttribute("aria-pressed", x === b));
+      $("#schedBody").innerHTML = scheduleRows();
+    }));
+    $("#schedSearch").addEventListener("input", e => { schedQuery = e.target.value; $("#schedBody").innerHTML = scheduleRows(); });
+  }
+  if (key === "update"){
+    const sel = $("#updTask"), rng = $("#updProg"), out = $("#updOut");
+    const syncTask = () => { const t = BY_ID[sel.value]; rng.value = Math.round(t.pAct * 20) * 5; out.textContent = rng.value + "%"; };
+    sel.addEventListener("change", syncTask); syncTask();
+    rng.addEventListener("input", () => out.textContent = rng.value + "%");
+    $("#delayToggle").addEventListener("change", e => $("#delayBox").classList.toggle("open", e.target.checked));
+    $("#updPhoto").addEventListener("change", e => { const n = e.target.files.length; $("#photoTxt").textContent = n ? plural(n,"photo") + " added" : "Add site photos"; });
+    $("#updForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const t = BY_ID[sel.value];
+      const plan = +$("#crewPlan").value || 0, act = +$("#crewAct").value || 0;
+      const note = $("#updNote").value.trim();
+      const label = t.name + (contextName(t) ? " (" + contextName(t) + ")" : "");
+      UPDATES.unshift({d:TODAY, who:"You, site engineer", text:`${label}: ${rng.value}% done.${note ? " " + note : ""}`, crew:[plan, act]});
+      if ($("#delayToggle").checked){
+        const cat = (document.querySelector('input[name="cat"]:checked') || {}).value || "Weather";
+        DELAYS.unshift({d:TODAY, task:label, cat, days:+$("#delayDays").value || 1, note: note || "Reason recorded from the site update."});
+      }
+      celebrate("Update posted to Morais Eden", () => { location.hash = "project"; });
+    });
+  }
+  if (key === "new"){
+    const pv = $("#npPreview");
+    const draw = () => pv.innerHTML = previewHTML();
+    draw();
+    $("#npStart").addEventListener("input", draw);
+    $("#npFile").addEventListener("change", e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      $("#drop").classList.add("has");
+      $("#dropTitle").textContent = f.name + " selected";
+      $("#dropSub").textContent = "Demo: the standard template is used for the preview. Import will read this file in the full version.";
+    });
+    $("#newForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const name = $("#npName").value.trim();
+      if (!name){ $("#npName").focus(); toast("Enter a project name to create the project."); return; }
+      const s = fromISO($("#npStart").value || "2027-06-01");
+      const end = END + (s - START);
+      const d = new Date(end * 864e5);
+      SITES.push({id:"p" + Date.now(), name, type:$("#npType").value || "Stilt + 5 floors", planned:0, actual:0, delay:0,
+        stage:"Starts " + fmt(s), handover: MON[d.getUTCMonth()] + " " + d.getUTCFullYear(), upcoming:true});
+      celebrate(name + " created with " + LEAVES.length + " activities", () => { location.hash = "portfolio"; });
+    });
+  }
+}
+
+/* ---------- Theme ---------- */
+(function theme(){
+  const root = document.documentElement;
+  try { const saved = localStorage.getItem("pm-theme"); if (saved) root.dataset.theme = saved; } catch(e){}
+  $("#themeBtn").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("pm-theme", root.dataset.theme); } catch(e){}
+  });
+})();
+
+/* ---------- Animated backdrop (shared by every page) ---------- */
+(function buildBackdrop(){
+  const host = document.querySelector(".backdrop");
+  if (!host) return;
+  host.insertAdjacentHTML("afterbegin", '<div class="bg-grid"></div>');
+  let m = "";
+  for (let i = 0; i < 24; i++){
+    const left = (i * 37 + 11) % 100, sz = 3 + (i % 4), dur = 18 + (i * 7) % 16, delay = -((i * 5.3) % dur), dx = (i % 2 ? 1 : -1) * (20 + (i * 13) % 60);
+    m += `<span class="mote" style="left:${left}%;--s:${sz}px;--dur:${dur}s;--delay:${delay.toFixed(1)}s;--dx:${dx}px;--c:${i % 3 ? "var(--plan)" : "var(--act)"}"></span>`;
+  }
+  const fill = a => `style="fill:color-mix(in srgb,var(--plan) ${a}%,transparent)"`;
+  let sk = `<svg class="skyline" viewBox="0 0 1600 240" preserveAspectRatio="xMidYMax slice">`;
+  let x = 0, k = 0;
+  while (x < 1600){ const w = 50 + (k * 29) % 60, h = 60 + (k * 53) % 110; sk += `<rect x="${x}" y="${240 - h}" width="${w}" height="${h}" ${fill(9)}/>`; x += w + 6; k++; }
+  x = 20; k = 0;
+  while (x < 1600){
+    const w = 70 + (k * 41) % 70, h = 40 + (k * 37) % 90;
+    if (!(x + w > 1150 && x < 1290)){
+      sk += `<rect x="${x}" y="${240 - h}" width="${w}" height="${h}" ${fill(15)}/>`;
+      for (let r = 0; r < Math.floor((h - 16) / 18); r++) for (let c = 0; c < Math.floor((w - 12) / 18); c++)
+        if ((r * 7 + c * 3 + k) % 4 === 0) sk += `<rect class="bwin" x="${x + 8 + c * 18}" y="${240 - h + 10 + r * 18}" width="8" height="8" style="fill:var(--act);fill-opacity:.15;--w:${(r * 3 + c * 5 + k) % 6}s"/>`;
+    }
+    x += w + 40 + (k * 17) % 50; k++;
+  }
+  for (let i = 0; i < 8; i++) sk += `<rect class="rise-fl" x="1180" y="${220 - i * 20}" width="90" height="18" rx="1" style="fill:color-mix(in srgb,var(--act) 22%,transparent);stroke:color-mix(in srgb,var(--act) 45%,transparent);--d:${(i * 1.2).toFixed(1)}s"/>`;
+  sk += `<rect x="1172" y="236" width="106" height="4" ${fill(30)}/>`;
+  const stroke = "stroke:color-mix(in srgb,var(--plan) 42%,transparent);stroke-width:1.6;fill:none";
+  const crane = (mx, top, left, right, jd) => {
+    let pts = ""; for (let y = 240, n = 0; y >= top; y -= 12, n++) pts += `${n % 2 ? mx + 5 : mx - 5},${y} `;
+    let c = `<g style="${stroke}"><line x1="${mx-5}" y1="240" x2="${mx-5}" y2="${top}"/><line x1="${mx+5}" y1="240" x2="${mx+5}" y2="${top}"/><polyline points="${pts}"/></g>`;
+    c += `<g class="jib" style="transform-origin:${mx}px ${top}px;--jd:${jd}s"><g style="${stroke}"><line x1="${mx-left}" y1="${top}" x2="${mx+right}" y2="${top}"/><line x1="${mx}" y1="${top-22}" x2="${mx-left}" y2="${top}"/><line x1="${mx}" y1="${top-22}" x2="${mx+right}" y2="${top}"/><line x1="${mx}" y1="${top}" x2="${mx}" y2="${top-22}"/><line x1="${mx-left*0.7}" y1="${top}" x2="${mx-left*0.7}" y2="${top+70}"/></g><rect x="${mx-left*0.7-11}" y="${top+70}" width="22" height="6" style="fill:color-mix(in srgb,var(--act) 55%,transparent)"/><rect x="${mx+right-18}" y="${top}" width="16" height="10" ${fill(38)}/></g>`;
+    c += `<circle class="beacon" cx="${mx}" cy="${top-25}" r="2.6" style="fill:var(--late)"/>`;
+    return c;
+  };
+  sk += crane(330, 40, 190, 50, 14) + crane(1225, 22, 170, 46, 18) + crane(820, 92, 120, 36, 11);
+  sk += `<rect x="0" y="238" width="1600" height="2" ${fill(30)}/></svg>`;
+  const ticksA = Array.from({length:24}, (_, i) => { const a = i * Math.PI / 12, r2 = i % 2 ? 74 : 68; return `<line x1="${(100+Math.cos(a)*80).toFixed(1)}" y1="${(100+Math.sin(a)*80).toFixed(1)}" x2="${(100+Math.cos(a)*r2).toFixed(1)}" y2="${(100+Math.sin(a)*r2).toFixed(1)}"/>`; }).join("");
+  const bpA = `<svg class="bp-shape s1" viewBox="0 0 200 200"><g style="fill:none;stroke:var(--plan);stroke-width:1"><circle cx="100" cy="100" r="80" stroke-dasharray="4 6"/><circle cx="100" cy="100" r="56"/><line x1="0" y1="100" x2="200" y2="100"/><line x1="100" y1="0" x2="100" y2="200"/>${ticksA}</g></svg>`;
+  const bpB = `<svg class="bp-shape s2" viewBox="0 0 200 200"><g style="fill:none;stroke:var(--act);stroke-width:1"><rect x="40" y="40" width="120" height="120" stroke-dasharray="6 5"/><path d="M40 40 L160 160 M160 40 L40 160"/><circle cx="100" cy="100" r="30"/><path d="M20 40 V160 M16 40 H24 M16 160 H24"/></g></svg>`;
+  host.insertAdjacentHTML("beforeend", `<div class="beam"></div>${bpA}${bpB}${m}${sk}`);
+})();
+
+window.addEventListener("hashchange", route);
+(function boot(){
+  const sp = document.getElementById("splash");
+  if (REDUCED || !sp){ if (sp) sp.remove(); route(); return; }
+  setTimeout(() => { route(); sp.classList.add("gone"); setTimeout(() => sp.remove(), 700); }, 1400);
+})();
+</script>
+</body>
+</html>
