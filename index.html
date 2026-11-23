@@ -104,8 +104,8 @@ a{color:inherit}
 
 .glass{
   background:var(--glass);
-  -webkit-backdrop-filter:blur(18px) saturate(150%);
-  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
   border:1px solid var(--stroke);
   border-radius:20px;
   box-shadow:var(--shadow);
@@ -349,15 +349,18 @@ input[type="range"]{padding:0;background:none;border:0;accent-color:var(--act)}
 #splash.gone{opacity:0;visibility:hidden}
 .splash-in{display:flex;flex-direction:column;align-items:center;gap:10px}
 .splash-in svg{width:88px;height:88px}
-.splash-in .sb{transform-box:fill-box;transform-origin:bottom;animation:barUp .8s cubic-bezier(.2,.8,.2,1) both}
+.splash-in .sb{transform-box:fill-box;transform-origin:bottom;animation:barUp .45s cubic-bezier(.2,.8,.2,1) both}
 @keyframes barUp{from{transform:scaleY(0)}}
-.splash-in b{font-size:30px;font-stretch:72%;font-weight:820;letter-spacing:-.01em;animation:rise .7s .35s both}
-.splash-in span{color:var(--muted);font-size:14px;animation:rise .7s .5s both}
+.splash-in b{font-size:30px;font-stretch:72%;font-weight:820;letter-spacing:-.01em;animation:rise .45s .12s both}
+.splash-in span{color:var(--muted);font-size:14px;animation:rise .45s .2s both}
 .splash-line{width:170px;height:3px;border-radius:3px;background:var(--track);overflow:hidden;margin-top:6px}
-.splash-line i{display:block;height:100%;background:var(--act);animation:load 1.3s ease-in-out both}
+.splash-line i{display:block;height:100%;background:var(--act);animation:load .6s ease-in-out both}
 @keyframes load{from{width:0}to{width:100%}}
 
-main > *{animation:rise .65s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--n,0) * 80ms)}
+main > *{animation:rise .42s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--n,0) * 45ms)}
+.chart.skel{border-radius:12px;background:linear-gradient(90deg,var(--track) 0,var(--glass-strong) 40%,var(--track) 80%);background-size:200% 100%;animation:skel 1.1s linear infinite}
+@keyframes skel{to{background-position:-200% 0}}
+@media (max-width:900px){.glass{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}}
 .live{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:650;color:var(--ok)}
 .live i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:ping 1.8s infinite}
 @keyframes ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
@@ -656,6 +659,80 @@ body.auth .app{grid-template-columns:minmax(0,1fr)}
   body.auth .topbar{display:none}
 }
 
+/* ---------- Analytics (Power BI style) ---------- */
+.bi-slicers{display:flex;flex-wrap:wrap;gap:14px 24px;padding:14px 18px;align-items:flex-end}
+.slicer{display:flex;flex-direction:column;gap:6px}
+.slicer label,.slicer .label{font-size:12.5px;font-weight:650;color:var(--muted)}
+.slicer select{padding:8px 10px;min-width:190px}
+.bi-pills{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;padding:0 4px}
+.pills-l{color:var(--muted)}
+.pill{display:inline-flex;gap:8px;align-items:center;padding:5px 6px 5px 12px;border-radius:99px;background:color-mix(in srgb,var(--plan) 14%,transparent);border:1px solid color-mix(in srgb,var(--plan) 35%,transparent);font-weight:620;animation:pop .3s cubic-bezier(.2,1.4,.4,1)}
+.pill button{border:0;background:var(--glass-strong);color:var(--text);border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1}
+.bi-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+.kpi{padding:14px 16px 10px;display:flex;flex-direction:column;gap:2px;overflow:hidden;min-width:0}
+.kpi-l{font-size:12.5px;color:var(--muted);font-weight:620}
+.kpi-v{font-size:34px;font-stretch:66%;font-weight:830;line-height:1.05}
+.kpi-s{font-size:12.5px;color:var(--muted)}
+.kpi.ok .kpi-v{color:var(--ok)}.kpi.warn .kpi-v{color:var(--warn)}.kpi.late .kpi-v{color:var(--late)}
+.spark{height:34px;margin-top:8px}
+.spark svg{width:100%;height:100%;display:block}
+.stackbar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-top:12px;gap:2px}
+.stackbar i{display:block;transform-origin:left;animation:fillx .9s cubic-bezier(.2,.8,.2,1) .3s backwards}
+.bi-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.tile{padding:16px 18px 12px;display:flex;flex-direction:column;min-width:0}
+.span-4{grid-column:span 4}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-8{grid-column:span 8}.span-12{grid-column:span 12}
+.tile-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
+.tile-head h2{font-size:16px}
+.tile-head p{margin:0;color:var(--muted);font-size:12.5px}
+.tile-head .icon-btn{height:32px;min-width:32px;padding:0 7px;flex:none}
+.chart{height:290px;width:100%;min-width:0}
+.chart .empty{padding-top:110px}
+.bi-table{min-width:560px}
+.bi-table td{padding:9px 8px}
+.muted-s{display:block;color:var(--muted);font-size:12px;font-weight:450}
+.vbar{display:inline-flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap}
+.vbar i{display:block;height:8px;border-radius:4px;background:var(--late);width:var(--w);transform-origin:left;animation:fillx .9s cubic-bezier(.2,.8,.2,1) .2s backwards}
+.bi-ms{list-style:none;margin:0;padding:0}
+.bi-ms li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--stroke);animation:rise .5s cubic-bezier(.2,.8,.2,1) backwards}
+.bi-ms li:first-child{border-top:0}
+.bi-ms b{display:block;font-weight:650;line-height:1.3}
+.bi-ms small{color:var(--muted);font-size:12.5px}
+.bi-ms .right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.dot2{width:10px;height:10px;border-radius:50%}
+.dot2.ok{background:var(--ok)}.dot2.late{background:var(--warn);animation:shut 1.4s ease-in-out infinite}
+.tile.focused{position:fixed;inset:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));z-index:85;background:var(--glass-strong);animation:pop .3s cubic-bezier(.2,1.2,.4,1)}
+.tile.focused .chart{flex:1;height:auto}
+.bi-dim{position:fixed;inset:0;z-index:84;background:color-mix(in srgb,var(--bg) 60%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:fadeIn .25s}
+@media (max-width:1180px){
+  .bi-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .span-4,.span-5{grid-column:span 6}
+  .span-7,.span-8{grid-column:span 12}
+}
+@media (max-width:760px){
+  .bi-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bi-grid > *{grid-column:span 12}
+  .slicer,.slicer select{width:100%}
+}
+
+/* Page loader */
+.pageload{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 45%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+.pageload.on{opacity:1;visibility:visible}
+.pl-card{padding:22px 30px 22px;border-radius:22px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:250px;background:var(--glass-strong);transform:scale(.9);transition:transform .3s cubic-bezier(.2,1.3,.4,1)}
+.pageload.on .pl-card{transform:none}
+.pl-card svg{width:180px;height:auto;display:block}
+.pl-card b{font-size:16px;font-weight:700}
+.pl-bar{width:190px;height:8px;border-radius:5px;background:var(--track);overflow:hidden}
+.pl-bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(-45deg,var(--act) 0 8px,#1A1200 8px 16px);background-size:22.63px 22.63px}
+.pageload.on .pl-bar i{animation:plhaz .5s linear infinite,plfill .8s cubic-bezier(.3,.6,.3,1) forwards}
+@keyframes plhaz{to{background-position:22.63px 0}}
+@keyframes plfill{from{width:4%}to{width:100%}}
+.lb{transform-box:fill-box;animation:lbIn 1.6s cubic-bezier(.3,1.3,.5,1) infinite;animation-delay:var(--d)}
+@keyframes lbIn{0%{opacity:0;transform:translateY(-28px)}14%,82%{opacity:1;transform:none}96%,100%{opacity:0;transform:none}}
+.plhook{animation:plhook 1.6s ease-in-out infinite}
+@keyframes plhook{50%{transform:translateY(32px)}}
+.plcable{transform-box:fill-box;transform-origin:50% 0;animation:plcable 1.6s ease-in-out infinite}
+@keyframes plcable{50%{transform:scaleY(2.07)}}
+
 #toast{
   position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);
   background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;
@@ -712,7 +789,7 @@ body.auth .app{grid-template-columns:minmax(0,1fr)}
 <body>
 <div class="backdrop" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span></div>
 <div id="splash" aria-hidden="true"><div class="splash-in">
-  <svg viewBox="0 0 34 34"><rect x="2" y="2" width="30" height="30" rx="9" style="fill:var(--act)"/><rect class="sb" x="7.5" y="15" width="3" height="10" rx="1.5" style="fill:var(--on-act);animation-delay:.1s"/><rect class="sb" x="12.5" y="11" width="3" height="14" rx="1.5" style="fill:var(--on-act);animation-delay:.22s"/><rect class="sb" x="17.5" y="17" width="3" height="8" rx="1.5" style="fill:var(--on-act);animation-delay:.34s"/><rect class="sb" x="22.5" y="8" width="3" height="17" rx="1.5" style="fill:var(--on-act);animation-delay:.46s"/></svg>
+  <svg viewBox="0 0 34 34"><rect x="2" y="2" width="30" height="30" rx="9" style="fill:var(--act)"/><rect class="sb" x="7.5" y="15" width="3" height="10" rx="1.5" style="fill:var(--on-act);animation-delay:0s"/><rect class="sb" x="12.5" y="11" width="3" height="14" rx="1.5" style="fill:var(--on-act);animation-delay:.05s"/><rect class="sb" x="17.5" y="17" width="3" height="8" rx="1.5" style="fill:var(--on-act);animation-delay:.1s"/><rect class="sb" x="22.5" y="8" width="3" height="17" rx="1.5" style="fill:var(--on-act);animation-delay:.15s"/></svg>
   <b>Progress Maker</b><span>Loading site data</span><div class="splash-line"><i></i></div>
 </div></div>
 
@@ -1083,6 +1160,7 @@ function siteStatus(s){
 
 /* ---------- Navigation ---------- */
 const ICONS = {
+  analytics:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="5" y="11" width="3" height="6" rx="1"/><rect x="10.5" y="6" width="3" height="11" rx="1"/><rect x="16" y="9" width="3" height="8" rx="1"/></svg>',
   portfolio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
   project:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-5h6v5M8 11h2M14 11h2"/></svg>',
   schedule:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h3M10 6h10M4 12h6M13 12h7M4 18h9M16 18h4"/></svg>',
@@ -1093,6 +1171,7 @@ const ICONS = {
 const ROUTES = [
   ["portfolio","All sites","Sites"],
   ["project","Morais Eden","Eden"],
+  ["analytics","Analytics","Analytics"],
   ["schedule","Schedule","Schedule"],
   ["update","Post site update","Update"],
   ["new","New project","New"]
@@ -1126,6 +1205,7 @@ function viewPortfolio(){
       <p class="sub">Progress Maker turns daily site reports into a live picture of planned against actual, so a delay shows up the day it happens, not at the month-end review.</p>
       <div class="actions">
         <a class="btn primary" href="#project">${ICONS.project}Open Morais Eden</a>
+        <a class="btn" href="#analytics">${ICONS.analytics}Analytics</a>
         <a class="btn" href="#new">${ICONS.new}New project</a>
         <button class="btn" type="button" data-print>${ICONS.print}Export PDF</button>
       </div>
@@ -1557,7 +1637,7 @@ function animateCounts(root){
   root.querySelectorAll("[data-count]").forEach(el => {
     const to = +el.dataset.count, dec = +(el.dataset.dec || 0), suf = el.dataset.suffix || "";
     if (REDUCED){ el.textContent = to.toFixed(dec) + suf; return; }
-    const t0 = performance.now() + 250, dur = 1400;
+    const t0 = performance.now() + 80, dur = 850;
     const step = now => {
       const k = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
       el.textContent = (to * e).toFixed(dec) + suf;
@@ -1882,14 +1962,390 @@ function viewLogin(){
   </div>`;
 }
 
+/* ---------- View: analytics (Power BI style report) ---------- */
+const AN_META = {
+  eden:{start:"2026-10-31", end:"2028-01-31", value:64, crew:85},
+  palm:{start:"2026-03-01", end:"2027-08-31", value:48, crew:60},
+  lake:{start:"2026-01-05", end:"2029-03-31", value:310, crew:240},
+  meadow:{start:"2025-06-01", end:"2027-07-31", value:96, crew:110},
+  orchid:{start:"2027-01-10", end:"2028-06-30", value:72, crew:70},
+  metro:{start:"2025-09-01", end:"2027-12-31", value:140, crew:150},
+  sunrise:{start:"2025-01-15", end:"2027-05-31", value:38, crew:40}
+};
+const SYN_DELAYS = {
+  lake:{"Weather":5,"Labour":4,"Material":6,"Equipment":2,"Drawings & approvals":1},
+  metro:{"Weather":2,"Labour":3,"Material":5,"Equipment":1,"Drawings & approvals":1},
+  palm:{"Weather":1,"Material":1},
+  sunrise:{"Labour":2,"Drawings & approvals":2}
+};
+const SYN_TASKS = {
+  lake:["5th floor roof slab","6th floor roof slab","7th floor column casting","Basement waterproofing"],
+  metro:["4th floor block work","5th floor block work","3rd floor plastering"],
+  palm:["3rd floor plastering","2nd floor tiling"],
+  sunrise:["Snag list","External painting"]
+};
+const SYN_ACTS = {
+  lake:[["7th floor roof slab",6,18,.62],["6th floor block work",14,14,.4],["Basement waterproofing",-10,9,.85]],
+  metro:[["5th floor block work",9,12,.35],["3rd floor plastering",20,8,.2]],
+  palm:[["3rd floor plastering",12,2,.64]],
+  sunrise:[["Snag list completion",10,4,.8]]
+};
+const SYN_MS = {
+  lake:[["8th floor roof slab",12,6]], metro:[["5th floor block work complete",20,12]],
+  palm:[["3rd floor plastering complete",9,2]], meadow:[["Final painting complete",15,0]],
+  orchid:[["1st floor roof slab",24,0]], sunrise:[["Snag list closed",18,4]]
+};
+const AN_PHASES = ["Sub-structure","Super-structure","Masonry","Finishing","Infrastructure"];
+const PH_RANGE = [[0,8],[8,40],[30,62],[50,95],[85,100]];
+const ST_LABEL = {ok:"On track", warn:"Slipping", late:"Delayed"};
+let AF = {site:"", status:"", reason:"", months:6};
+let AN_CH = {}, AN_RO = null;
+const cv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function hrand(a, b){ const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); }
+function hexA(h, a){ const n = parseInt(h.replace("#",""), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; }
+const S3 = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+const stKey = s => s.delay <= 0 ? "ok" : s.delay <= 7 ? "warn" : "late";
+function anSites(){
+  return SITES.filter(s => AN_META[s.id]).map(s => { const m = AN_META[s.id]; return Object.assign({}, s, {meta:m, st:fromISO(m.start), en:fromISO(m.end)}); });
+}
+function sitePlan(s, d){
+  if (s.id === "eden") return planAt(d);
+  const r0 = S3((TODAY - s.st) / (s.en - s.st)) || 1e-6;
+  return Math.min(1, S3((d - s.st) / (s.en - s.st)) * (s.planned / 100) / r0);
+}
+function siteAct(s, d){
+  if (s.id === "eden") return actAt(Math.min(d, TODAY));
+  const lag = Math.max(0, s.delay), f = x => S3((x - lag - s.st) / (s.en - s.st));
+  const r0 = f(TODAY);
+  return r0 ? Math.min(1, f(Math.min(d, TODAY)) * (s.actual / 100) / r0) : 0;
+}
+function agg(list, fn, d){ let w = 0, v = 0; list.forEach(s => { w += s.meta.value; v += s.meta.value * fn(s, d); }); return w ? v / w : 0; }
+function anMonths(n){
+  const out = [];
+  for (let i = n - 1; i >= 0; i--){
+    const dt = new Date(Date.UTC(2027, 3 - i, 1)), y = dt.getUTCFullYear(), m = dt.getUTCMonth();
+    out.push({label:MON[m] + " " + String(y).slice(2), st:Math.round(Date.UTC(y, m, 1) / 864e5), en:Math.min(TODAY, Math.round(Date.UTC(y, m + 1, 0) / 864e5))});
+  }
+  return out;
+}
+function anEvents(){
+  const ev = DELAYS.map(x => ({site:"eden", d:x.d, cat:x.cat, days:x.days, task:x.task}));
+  const all = anSites();
+  Object.entries(SYN_DELAYS).forEach(([sid, cats]) => {
+    const s = all.find(z => z.id === sid); if (!s) return;
+    let n = 0;
+    Object.entries(cats).forEach(([cat, days]) => {
+      for (let i = 0; i < days; i++, n++){
+        const span = TODAY - Math.max(s.st, TODAY - 360);
+        ev.push({site:sid, d:TODAY - Math.floor(hrand(n + 1, sid.length * 7) * span), cat, days:1, task:SYN_TASKS[sid][n % SYN_TASKS[sid].length]});
+      }
+    });
+  });
+  return ev;
+}
+function phasePct(s, i){
+  if (s.id === "eden") return Math.round(BY_ID[[2,6,80,135,186][i]].pAct * 100);
+  const [a, b] = PH_RANGE[i];
+  return Math.round(Math.max(0, Math.min(1, (s.actual - a) / (b - a))) * 100);
+}
+function crewAt(s, d){
+  const k = TODAY - d;
+  if (s.id === "eden" && k < CREW.length) return [s.meta.crew, CREW[CREW.length - 1 - k]];
+  return [s.meta.crew, Math.round(s.meta.crew * (0.76 + 0.2 * hrand(d, s.meta.crew)))];
+}
+function anActivities(list){
+  const ids = list.map(s => s.id), out = [];
+  if (ids.includes("eden")) TASKS.filter(t => t.leaf && t.pAct < 1 && t.af - t.f > 0 && (t.pAct > 0 || t.pPlan > 0))
+    .forEach(t => out.push({site:"Morais Eden", name:t.name + (contextName(t) ? " (" + contextName(t) + ")" : ""), f:t.f, af:t.af, v:t.af - t.f, p:t.pAct}));
+  Object.entries(SYN_ACTS).forEach(([sid, arr]) => {
+    const s = list.find(z => z.id === sid); if (!s) return;
+    arr.forEach(([n, off, v, p]) => out.push({site:s.name, name:n, f:TODAY + off, af:TODAY + off + v, v, p}));
+  });
+  return out.sort((a, b) => b.v - a.v).slice(0, 7);
+}
+function anMilestones(list){
+  const ids = list.map(s => s.id), out = [];
+  if (ids.includes("eden")) TASKS.filter(t => t.ms && t.pAct < 1 && t.af > TODAY && t.af <= TODAY + 30).forEach(t => out.push({site:"Morais Eden", name:t.name, af:t.af, v:t.af - t.f}));
+  Object.entries(SYN_MS).forEach(([sid, arr]) => {
+    const s = list.find(z => z.id === sid); if (!s) return;
+    arr.forEach(([n, off, v]) => out.push({site:s.name, name:n, af:TODAY + off, v}));
+  });
+  return out.sort((a, b) => a.af - b.af);
+}
+function sparkSVG(vals, color){
+  if (vals.length < 2) return "";
+  const W = 160, H = 34, mx = Math.max(...vals), mn = Math.min(...vals), r = (mx - mn) || 1;
+  const d = vals.map((v, i) => (i ? "L" : "M") + (i / (vals.length - 1) * W).toFixed(1) + " " + (H - 3 - (v - mn) / r * (H - 6)).toFixed(1)).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d} L${W} ${H} L0 ${H}Z" style="fill:${color};fill-opacity:.14"/><path class="draw" pathLength="1" d="${d}" style="fill:none;stroke:${color};stroke-width:2;vector-effect:non-scaling-stroke"/></svg>`;
+}
+function tileHTML(id, title, sub, span, body){
+  return `<section class="glass tile ${span}"><header class="tile-head"><div><h2>${title}</h2><p id="${id}_sub">${sub}</p></div><button class="icon-btn" type="button" data-focus aria-label="Focus mode" title="Focus mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></header>${body || `<div class="chart" id="${id}"></div>`}</section>`;
+}
+function viewAnalytics(){
+  const sites = anSites();
+  return `
+  <header class="page-head">
+    <div>
+      <h1>Portfolio analytics</h1>
+      <p class="sub">An interactive report across every site, as of ${fmt(TODAY)}. Click any bar, slice or cell to filter the whole page.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" type="button" id="biReset">Reset filters</button>
+      <button class="btn" type="button" data-print>${ICONS.print}Export PDF</button>
+    </div>
+  </header>
+  <section class="glass bi-slicers" aria-label="Filters">
+    <div class="slicer"><label for="fSite">Site</label><select id="fSite"><option value="">All sites</option>${sites.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join("")}</select></div>
+    <div class="slicer"><span class="label">Status</span><div class="seg" id="fStatus" role="group" aria-label="Status">${[["","All"],["ok","On track"],["warn","Slipping"],["late","Delayed"]].map(([v,l]) => `<button type="button" data-v="${v}">${l}</button>`).join("")}</div></div>
+    <div class="slicer"><label for="fReason">Delay reason</label><select id="fReason"><option value="">All reasons</option>${CATS.map(c => `<option value="${esc(c)}">${c}</option>`).join("")}</select></div>
+    <div class="slicer"><span class="label">Period</span><div class="seg" id="fPeriod" role="group" aria-label="Period">${[3,6,12].map(m => `<button type="button" data-v="${m}">${m} months</button>`).join("")}</div></div>
+  </section>
+  <div class="bi-pills" id="biPills" aria-live="polite"></div>
+  <section class="bi-kpis" id="biKpis" aria-label="Key figures"></section>
+  <div class="bi-grid">
+    ${tileHTML("c_sites","Planned against actual by site","Blue is where the plan says each site should be today, orange is work done. Click a site to filter.","span-8")}
+    ${tileHTML("c_gauge","Schedule health","Schedule performance index: work done divided by work planned. 1.00 is exactly on plan.","span-4")}
+    ${tileHTML("c_reason","Days lost by reason","Click a reason to filter.","span-5")}
+    ${tileHTML("c_months","Delays by month","","span-7")}
+    ${tileHTML("c_trend","Progress trend","Cumulative work done, weighted by project value. Drag the slider to zoom.","span-7")}
+    ${tileHTML("c_crew","Crew on site","Workers present against planned crew, last 30 days.","span-5")}
+    ${tileHTML("c_matrix","Phase completion by site","Share of each phase finished. Click a cell to filter by site.","span-7")}
+    ${tileHTML("c_value","Portfolio value by status","Contract value in ₹ crore (sample figures), coloured by schedule status.","span-5")}
+    ${tileHTML("biActs","Most delayed activities","Ranked by forecast delay against the planned finish.","span-7",'<div class="scroll-x" id="biActs"></div>')}
+    ${tileHTML("biMs","Milestones due in the next 30 days","Forecast dates from the latest site updates.","span-5",'<div id="biMs"></div>')}
+  </div>`;
+}
+function disposeAnalytics(){
+  Object.values(AN_CH).forEach(c => { try { c.dispose(); } catch(e){} });
+  AN_CH = {};
+  if (AN_RO){ AN_RO.disconnect(); AN_RO = null; }
+  document.querySelectorAll(".bi-dim").forEach(d => d.remove());
+}
+function toggleFocus(tile){
+  if (!tile) return;
+  const on = !tile.classList.contains("focused");
+  document.querySelectorAll(".tile.focused").forEach(t => { t.classList.remove("focused"); const b = t.querySelector("[data-focus]"); if (b) b.setAttribute("aria-label","Focus mode"); });
+  document.querySelectorAll(".bi-dim").forEach(d => d.remove());
+  if (on){
+    tile.classList.add("focused");
+    const d = document.createElement("div"); d.className = "bi-dim"; d.addEventListener("click", () => toggleFocus(tile));
+    document.body.appendChild(d);
+    tile.querySelector("[data-focus]").setAttribute("aria-label", "Exit focus mode");
+  }
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ const t = document.querySelector(".tile.focused"); if (t) toggleFocus(t); } });
+function refreshAnalytics(){ if (location.hash === "#analytics" && document.getElementById("biKpis")) anRender(); }
+
+function anRender(){
+  const all = anSites();
+  const bySite = all.filter(s => !AF.status || stKey(s) === AF.status);
+  const L = bySite.filter(s => !AF.site || s.id === AF.site);
+  const ids = new Set(L.map(s => s.id));
+  const months = anMonths(AF.months), m12 = anMonths(12);
+  const evSite = anEvents().filter(e => ids.has(e.site) && e.d >= months[0].st);
+  const ev = evSite.filter(e => !AF.reason || e.cat === AF.reason);
+  const act = agg(L, siteAct, TODAY), plan = agg(L, sitePlan, TODAY), spi = plan ? act / plan : 1;
+  const crew = []; for (let k = 29; k >= 0; k--){ const d = TODAY - k; let p = 0, a = 0; L.forEach(s => { const r = crewAt(s, d); p += r[0]; a += r[1]; }); crew.push([d, p, a]); }
+  const today = crew[crew.length - 1];
+  const ms = anMilestones(L);
+  const cnt = {ok:0, warn:0, late:0}; L.forEach(s => cnt[stKey(s)]++);
+  const daysLost = ev.reduce((a, e) => a + e.days, 0);
+  const monthDays = months.map(m => ev.filter(e => e.d >= m.st && e.d <= m.en).reduce((a, e) => a + e.days, 0));
+  const C = {text:cv("--text"), muted:cv("--muted"), stroke:cv("--stroke"), plan:cv("--plan"), act:cv("--act"), ok:cv("--ok"), warn:cv("--warn"), late:cv("--late"), bg:cv("--bg")};
+  const spiCls = spi >= 0.97 ? "ok" : spi >= 0.9 ? "warn" : "late";
+  const gap = (act - plan) * 100;
+  const msLate = ms.filter(m => m.v > 0).length;
+  const kpi = (cls, label, valHTML, sub, extra) => `<div class="glass kpi ${cls}"><span class="kpi-l">${label}</span><b class="kpi-v">${valHTML}</b><span class="kpi-s">${sub}</span>${extra || ""}</div>`;
+  $("#biKpis").innerHTML =
+    kpi("", "Work done", `<span data-count="${(act*100).toFixed(1)}" data-dec="1" data-suffix="%">0%</span>`, `${gap >= 0 ? "+" : ""}${gap.toFixed(1)} pts against plan`, `<div class="spark">${sparkSVG(m12.map(m => agg(L, siteAct, m.en)), C.act)}</div>`) +
+    kpi(spiCls, "Schedule index", `<span data-count="${spi.toFixed(2)}" data-dec="2">0</span>`, "1.00 means on plan", `<div class="spark">${sparkSVG(m12.map(m => { const p = agg(L, sitePlan, m.en); return p ? agg(L, siteAct, m.en) / p : 1; }), C[spiCls])}</div>`) +
+    kpi(cnt.late ? "late" : "ok", "Sites delayed", `<span data-count="${cnt.late}">0</span>`, `${cnt.warn} slipping, ${cnt.ok} on track`, `<div class="stackbar">${[["ok",cnt.ok],["warn",cnt.warn],["late",cnt.late]].filter(x => x[1]).map(([k,v]) => `<i style="flex:${v};background:var(--${k})"></i>`).join("")}</div>`) +
+    kpi("", "Days lost", `<span data-count="${daysLost}">0</span>`, `Last ${AF.months} months${AF.reason ? ", " + esc(AF.reason).toLowerCase() : ""}`, `<div class="spark">${sparkSVG(monthDays, C.late)}</div>`) +
+    kpi("", "Workers on site today", `<span data-count="${today[2]}">0</span>`, `of ${today[1]} planned (${today[1] ? Math.round(today[2] / today[1] * 100) : 0}%)`, `<div class="spark">${sparkSVG(crew.map(r => r[1] ? r[2] / r[1] : 0), C.ok)}</div>`) +
+    kpi(msLate ? "warn" : "ok", "Milestones in 30 days", `<span data-count="${ms.length}">0</span>`, `${msLate} forecast late`, `<div class="stackbar">${ms.length ? `<i style="flex:${ms.length - msLate};background:var(--ok)"></i><i style="flex:${msLate};background:var(--warn)"></i>` : ""}</div>`);
+  animateCounts($("#biKpis"));
+
+  const pills = [];
+  if (AF.site) pills.push(["site", "Site: " + (all.find(s => s.id === AF.site) || {}).name]);
+  if (AF.status) pills.push(["status", "Status: " + ST_LABEL[AF.status]]);
+  if (AF.reason) pills.push(["reason", "Reason: " + AF.reason]);
+  $("#biPills").innerHTML = pills.length
+    ? `<span class="pills-l">Filtered by</span>` + pills.map(([k,l]) => `<span class="pill">${esc(l)}<button type="button" data-clear="${k}" aria-label="Remove filter ${esc(l)}">×</button></span>`).join("")
+    : `<span class="pills-l">Showing all sites. Click a bar, slice or cell to filter the page.</span>`;
+  $("#fSite").value = AF.site; $("#fReason").value = AF.reason;
+  document.querySelectorAll("#fStatus button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === AF.status));
+  document.querySelectorAll("#fPeriod button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.v === AF.months));
+  $("#c_months_sub").textContent = `Days lost each month over the last ${AF.months} months, by reason. Click a colour to filter.`;
+
+  const acts = anActivities(L), maxV = Math.max(1, ...acts.map(a => a.v));
+  $("#biActs").innerHTML = acts.length
+    ? `<table class="bi-table"><thead><tr><th>Activity</th><th>Site</th><th>Due</th><th>Forecast</th><th>Delay</th></tr></thead><tbody>${acts.map((a, i) => `<tr style="--i:${i}"><td>${esc(a.name)}<small class="muted-s">${Math.round(a.p * 100)}% done</small></td><td>${esc(a.site)}</td><td class="dates">${fmt(a.f, true)}</td><td class="dates">${fmt(a.af, true)}</td><td><span class="vbar"><i style="--w:${Math.round(a.v / maxV * 70) + 8}px"></i>${a.v} d</span></td></tr>`).join("")}</tbody></table>`
+    : `<p class="empty">No late activities for this selection.</p>`;
+  $("#biMs").innerHTML = ms.length
+    ? `<ul class="bi-ms">${ms.map((m, i) => `<li style="animation-delay:${i * 60}ms"><span class="dot2 ${m.v > 0 ? "late" : "ok"}"></span><div><b>${esc(m.name)}</b><small>${esc(m.site)}</small></div><div class="right"><small>${fmt(m.af, true)}</small>${m.v > 0 ? `<span class="chip warn">+${m.v} d</span>` : `<span class="chip ok">On time</span>`}</div></li>`).join("")}</ul>`
+    : `<p class="empty">No milestones due in the next 30 days for this selection.</p>`;
+
+  if (!window.echarts) return;
+  const font = "Archivo, system-ui, sans-serif";
+  const dark = parseInt(C.text.replace("#","").slice(0,2), 16) > 128;
+  const RC = {"Weather":C.plan, "Labour":C.act, "Material":C.late, "Equipment":"#2CB9AE", "Drawings & approvals":"#9B7BEA"};
+  const base = {textStyle:{fontFamily:font, color:C.muted}, animationDuration:900, animationEasing:"cubicOut", animationDurationUpdate:700};
+  const tip = o => Object.assign({backgroundColor:C.bg, borderColor:C.stroke, textStyle:{color:C.text, fontFamily:font}, extraCssText:"border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"}, o);
+  const axisCat = data => ({type:"category", data, axisLabel:{color:C.muted}, axisLine:{lineStyle:{color:C.stroke}}, axisTick:{show:false}});
+  const axisVal = o => Object.assign({type:"value", axisLabel:{color:C.muted}, splitLine:{lineStyle:{color:C.stroke}}}, o);
+  const legend = o => Object.assign({top:0, itemWidth:12, itemHeight:8, textStyle:{color:C.muted, fontFamily:font}}, o);
+  const chart = (id, opt, onClick) => {
+    let c = AN_CH[id];
+    if (!c){ const el = document.getElementById(id); if (!el) return; c = echarts.init(el, null, {renderer:"svg"}); AN_CH[id] = c; if (AN_RO) AN_RO.observe(el); }
+    c.setOption(Object.assign({}, base, opt), true);
+    c.off("click"); if (onClick) c.on("click", onClick);
+  };
+  const fade = s => AF.site && AF.site !== s.id ? 0.28 : 1;
+  const rev = bySite.slice().reverse();
+  chart("c_sites", {
+    grid:{left:6, right:44, top:30, bottom:4, containLabel:true}, legend:legend({right:0}),
+    tooltip:tip({trigger:"axis", axisPointer:{type:"shadow"}, valueFormatter:v => v + "%"}),
+    xAxis:axisVal({max:100, axisLabel:{color:C.muted, formatter:"{value}%"}}),
+    yAxis:Object.assign(axisCat(rev.map(s => s.name)), {axisLabel:{color:C.text, fontWeight:600}}),
+    series:[
+      {name:"Planned", type:"bar", barGap:"18%", barMaxWidth:12, color:C.plan, itemStyle:{borderRadius:[0,4,4,0]}, data:rev.map(s => ({value:+s.planned.toFixed(1), itemStyle:{opacity:fade(s)}}))},
+      {name:"Actual", type:"bar", barMaxWidth:12, color:C.act, itemStyle:{borderRadius:[0,4,4,0]}, label:{show:true, position:"right", formatter:"{c}%", color:C.text, fontSize:11, fontFamily:font}, data:rev.map(s => ({value:+s.actual.toFixed(1), itemStyle:{opacity:fade(s)}}))}
+    ]
+  }, p => { const s = rev[p.dataIndex]; if (s){ AF.site = AF.site === s.id ? "" : s.id; anRender(); } });
+  chart("c_gauge", {
+    series:[{type:"gauge", min:0.6, max:1.1, startAngle:210, endAngle:-30, radius:"92%", center:["50%","58%"], splitNumber:5,
+      axisLine:{lineStyle:{width:16, color:[[0.6, C.late],[0.74, C.warn],[1, C.ok]]}},
+      pointer:{width:5, length:"60%", itemStyle:{color:C.text}}, anchor:{show:true, size:14, itemStyle:{color:C.text, borderColor:C.bg, borderWidth:3}},
+      axisTick:{show:false}, splitLine:{length:16, lineStyle:{color:C.bg, width:3}},
+      axisLabel:{color:C.muted, distance:22, fontSize:11, formatter:v => v.toFixed(1)},
+      title:{offsetCenter:[0,"62%"], color:C.muted, fontSize:12, fontFamily:font},
+      detail:{valueAnimation:true, formatter:v => v.toFixed(2), color:C[spiCls], fontSize:34, fontWeight:800, fontFamily:font, offsetCenter:[0,"32%"]},
+      data:[{value:+spi.toFixed(3), name:spi >= 0.97 ? "On plan" : spi >= 0.9 ? "Watch closely" : "Needs action"}]}]
+  });
+  const evNoReason = evSite;
+  const sums = CATS.map(c => ({name:c, value:evNoReason.filter(e => e.cat === c).reduce((a, e) => a + e.days, 0)}));
+  const total = sums.reduce((a, s) => a + s.value, 0);
+  chart("c_reason", {
+    tooltip:tip({trigger:"item", formatter:p => `${p.name}<br><b>${p.value} days</b> (${p.percent}%)`}),
+    legend:legend({orient:"vertical", right:0, top:"middle", itemWidth:10, itemHeight:10, textStyle:{color:C.text, fontFamily:font}, formatter:n => `${n}  ${(sums.find(s => s.name === n) || {}).value || 0} d`}),
+    title:{text:String(total), subtext:"days lost", left:"32%", top:"38%", textAlign:"center", textStyle:{color:C.text, fontSize:30, fontWeight:800, fontFamily:font}, subtextStyle:{color:C.muted, fontSize:12, fontFamily:font}},
+    series:[{type:"pie", radius:["50%","76%"], center:["33%","52%"], padAngle:2, itemStyle:{borderRadius:6}, label:{show:false}, emphasis:{scale:true, scaleSize:7},
+      data:sums.filter(s => s.value > 0).map(s => ({name:s.name, value:s.value, itemStyle:{color:RC[s.name], opacity:AF.reason && AF.reason !== s.name ? 0.3 : 1}}))}]
+  }, p => { AF.reason = AF.reason === p.name ? "" : p.name; anRender(); });
+  const cats = AF.reason ? [AF.reason] : CATS;
+  chart("c_months", {
+    grid:{left:6, right:8, top:34, bottom:4, containLabel:true}, legend:legend({left:0, itemWidth:10, itemHeight:10}),
+    tooltip:tip({trigger:"axis", axisPointer:{type:"shadow"}}),
+    xAxis:axisCat(months.map(m => m.label)), yAxis:axisVal({minInterval:1}),
+    series:cats.map(c => ({name:c, type:"bar", stack:"d", barMaxWidth:32, color:RC[c], emphasis:{focus:"series"}, data:months.map(m => ev.filter(e => e.cat === c && e.d >= m.st && e.d <= m.en).reduce((a, e) => a + e.days, 0))}))
+  }, p => { AF.reason = AF.reason === p.seriesName ? "" : p.seriesName; anRender(); });
+  const grad = col => new echarts.graphic.LinearGradient(0, 0, 0, 1, [{offset:0, color:hexA(col, .38)}, {offset:1, color:hexA(col, 0)}]);
+  const zStart = (12 - AF.months) / 12 * 100;
+  chart("c_trend", {
+    grid:{left:6, right:14, top:34, bottom:46, containLabel:true}, legend:legend({left:0}),
+    tooltip:tip({trigger:"axis", valueFormatter:v => v + "%"}),
+    xAxis:Object.assign(axisCat(m12.map(m => m.label)), {boundaryGap:false}), yAxis:axisVal({axisLabel:{color:C.muted, formatter:"{value}%"}}),
+    dataZoom:[{type:"inside", start:zStart, end:100}, {type:"slider", height:16, bottom:8, start:zStart, end:100, borderColor:C.stroke, fillerColor:hexA(C.plan, .18), handleStyle:{color:C.plan, borderColor:C.plan}, moveHandleStyle:{color:C.plan}, textStyle:{color:C.muted}, dataBackground:{lineStyle:{color:C.plan}, areaStyle:{color:hexA(C.plan, .15)}}}],
+    series:[
+      {name:"Planned", type:"line", smooth:true, symbolSize:5, color:C.plan, lineStyle:{width:2.5, type:"dashed"}, data:m12.map(m => +(agg(L, sitePlan, m.en) * 100).toFixed(1))},
+      {name:"Actual", type:"line", smooth:true, symbolSize:6, color:C.act, lineStyle:{width:3}, areaStyle:{color:grad(C.act)}, data:m12.map(m => +(agg(L, siteAct, m.en) * 100).toFixed(1))}
+    ]
+  });
+  chart("c_crew", {
+    grid:{left:6, right:10, top:34, bottom:4, containLabel:true}, legend:legend({left:0}),
+    tooltip:tip({trigger:"axis"}),
+    xAxis:Object.assign(axisCat(crew.map(r => fmt(r[0], true))), {boundaryGap:false}), yAxis:axisVal({}),
+    series:[
+      {name:"Planned crew", type:"line", step:"middle", symbol:"none", color:C.plan, lineStyle:{type:"dashed", width:2}, data:crew.map(r => r[1])},
+      {name:"Present", type:"line", smooth:true, symbol:"none", color:C.ok, lineStyle:{width:2.5}, areaStyle:{color:grad(C.ok)}, data:crew.map(r => r[2])}
+    ]
+  });
+  const hdata = []; bySite.forEach((s, y) => AN_PHASES.forEach((p, x) => hdata.push({value:[x, y, phasePct(s, x)], itemStyle:{opacity:fade(s)}})));
+  chart("c_matrix", {
+    grid:{left:6, right:8, top:8, bottom:4, containLabel:true},
+    tooltip:tip({formatter:p => `${bySite[p.value[1]].name}<br>${AN_PHASES[p.value[0]]}: <b>${p.value[2]}%</b>`}),
+    xAxis:{type:"category", data:AN_PHASES, axisLabel:{color:C.muted, interval:0, fontSize:11}, axisLine:{show:false}, axisTick:{show:false}},
+    yAxis:{type:"category", data:bySite.map(s => s.name), axisLabel:{color:C.text, fontWeight:600}, axisLine:{show:false}, axisTick:{show:false}},
+    visualMap:{show:false, min:0, max:100, inRange:{color:[hexA(C.plan, .1), hexA(C.plan, .55), C.ok]}},
+    series:[{type:"heatmap", data:hdata, label:{show:true, formatter:p => p.value[2] + "%", color:C.text, fontSize:11, fontWeight:600, fontFamily:font}, itemStyle:{borderColor:C.bg, borderWidth:3, borderRadius:6}, emphasis:{itemStyle:{shadowBlur:12, shadowColor:"rgba(0,0,0,.25)"}}}]
+  }, p => { const s = bySite[p.value[1]]; if (s){ AF.site = AF.site === s.id ? "" : s.id; anRender(); } });
+  chart("c_value", {
+    tooltip:tip({formatter:p => { const s = bySite.find(z => z.name === p.name); return `${p.name}<br>₹${p.value} Cr, ${s ? ST_LABEL[stKey(s)].toLowerCase() : ""}`; }}),
+    series:[{type:"treemap", roam:false, nodeClick:false, breadcrumb:{show:false}, top:0, left:0, right:0, bottom:0,
+      label:{show:true, formatter:p => `{n|${p.name}}\n{v|₹${p.value} Cr}`, rich:{n:{fontSize:13, fontWeight:700, color:dark ? "#06121f" : "#fff", fontFamily:font}, v:{fontSize:12, color:dark ? "rgba(6,18,31,.8)" : "rgba(255,255,255,.88)", fontFamily:font}}},
+      itemStyle:{borderColor:C.bg, borderWidth:3, gapWidth:3, borderRadius:8},
+      data:bySite.map(s => ({name:s.name, value:s.meta.value, itemStyle:{color:C[stKey(s)], opacity:AF.site && AF.site !== s.id ? 0.35 : 1}}))}]
+  }, p => { const s = bySite.find(z => z.name === p.name); if (s){ AF.site = AF.site === s.id ? "" : s.id; anRender(); } });
+}
+
 /* ---------- Router ---------- */
-const VIEWS = {login:viewLogin, portfolio:viewPortfolio, project:viewProject, schedule:viewSchedule, update:viewUpdate, new:viewNew};
+const VIEWS = {login:viewLogin, portfolio:viewPortfolio, project:viewProject, analytics:viewAnalytics, schedule:viewSchedule, update:viewUpdate, new:viewNew};
+/* ---------- Charts library, loaded only when needed ---------- */
+function loadECharts(){
+  if (window.echarts) return Promise.resolve();
+  if (!loadECharts.p) loadECharts.p = new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js";
+    s.async = true;
+    s.onload = () => res();
+    s.onerror = () => { loadECharts.p = null; rej(new Error("charts failed")); };
+    document.head.appendChild(s);
+  });
+  return loadECharts.p;
+}
+
+/* ---------- Page loader between pages ---------- */
+const LOAD_LABELS = {login:"Signing you out", portfolio:"Loading all sites", project:"Opening Morais Eden", analytics:"Building your report", schedule:"Loading 199 activities", update:"Opening the site update", new:"Preparing the template"};
+let booted = false, loadT = null;
+function pageLoaderEl(){
+  let el = document.getElementById("pageload");
+  if (el) return el;
+  let blocks = "";
+  [["#8e96ad",0],["#a7aec2",.28],["#c3c9d9",.56],["var(--act)",.84]].forEach(([c,d], i) => {
+    blocks += `<rect class="lb" x="72" y="${110 - i * 16}" width="56" height="14" rx="2" style="fill:${c};--d:${d}s"/>`;
+  });
+  let zz = ""; for (let y = 128, n = 0; y >= 26; y -= 10, n++) zz += `${n % 2 ? 160 : 152},${y} `;
+  document.body.insertAdjacentHTML("beforeend", `<div class="pageload" id="pageload" role="status" aria-live="polite">
+    <div class="glass pl-card">
+      <svg viewBox="0 0 200 140" aria-hidden="true">
+        <rect x="20" y="126" width="160" height="3" rx="1.5" style="fill:var(--stroke)"/>
+        <g style="fill:none;stroke:var(--text);stroke-opacity:.55;stroke-width:1.5"><line x1="152" y1="128" x2="152" y2="24"/><line x1="160" y1="128" x2="160" y2="24"/><polyline points="${zz}"/><line x1="156" y1="24" x2="156" y2="8"/><line x1="156" y1="8" x2="64" y2="22"/><line x1="156" y1="8" x2="186" y2="22"/></g>
+        <rect x="60" y="20" width="128" height="5" rx="2" style="fill:var(--act)"/>
+        <rect x="172" y="25" width="14" height="9" rx="1.5" style="fill:var(--text);fill-opacity:.5"/>
+        <circle class="cbeacon" cx="156" cy="6" r="2.6" style="fill:var(--late)"/>
+        <g transform="translate(100 25)"><rect class="plcable" x="-0.7" y="0" width="1.4" height="30" style="fill:var(--text);fill-opacity:.6"/><g class="plhook"><rect x="-14" y="30" width="28" height="6" rx="1.5" style="fill:var(--act)"/></g></g>
+        ${blocks}
+        <circle class="puff" cx="70" cy="124" r="3" style="fill:var(--muted);--d:0s"/><circle class="puff" cx="130" cy="124" r="3" style="fill:var(--muted);--d:.8s"/>
+      </svg>
+      <b>Loading</b>
+      <div class="pl-bar"><i></i></div>
+    </div>
+  </div>`);
+  return document.getElementById("pageload");
+}
 function route(){
+  let key = (location.hash || "").replace("#","");
+  if (!VIEWS[key]) key = location.hash ? "portfolio" : "login";
+  if (!booted || REDUCED){ booted = true; renderRoute(); return; }
+  const el = pageLoaderEl();
+  el.querySelector("b").textContent = LOAD_LABELS[key] || "Loading";
+  el.classList.remove("on");
+  void el.offsetWidth;
+  el.classList.add("on");
+  clearTimeout(loadT);
+  const t0 = performance.now();
+  requestAnimationFrame(() => {
+    renderRoute();
+    loadT = setTimeout(() => el.classList.remove("on"), Math.max(0, 500 - (performance.now() - t0)));
+  });
+}
+function renderRoute(){
   let key = (location.hash || "").replace("#","");
   if (!VIEWS[key]) key = location.hash ? "portfolio" : "login";
   document.body.classList.toggle("auth", key === "login");
   renderNav(key);
   const v = $("#view");
+  disposeAnalytics();
   v.innerHTML = VIEWS[key]();
   Array.from(v.children).forEach((c, i) => c.style.setProperty("--n", i));
   window.scrollTo(0,0);
@@ -1929,6 +2385,32 @@ function bind(key){
         toast("Signed in. Welcome back.");
       }, REDUCED ? 200 : 1100);
     });
+  }
+  if (key === "analytics"){
+    AN_RO = window.ResizeObserver ? new ResizeObserver(entries => entries.forEach(en => { const c = AN_CH[en.target.id]; if (c) c.resize(); })) : null;
+    if (!window.echarts){
+      document.querySelectorAll(".chart").forEach(el => el.classList.add("skel"));
+      loadECharts().then(() => {
+        if (!document.getElementById("biKpis")) return;
+        document.querySelectorAll(".chart.skel").forEach(el => el.classList.remove("skel"));
+        anRender();
+      }).catch(() => {
+        document.querySelectorAll(".chart").forEach(el => { el.classList.remove("skel"); el.innerHTML = '<p class="empty">Charts need an internet connection to load.</p>'; });
+      });
+    }
+    $("#fSite").addEventListener("change", e => { AF.site = e.target.value; anRender(); });
+    $("#fReason").addEventListener("change", e => { AF.reason = e.target.value; anRender(); });
+    document.querySelectorAll("#fStatus button").forEach(b => b.addEventListener("click", () => {
+      AF.status = b.dataset.v;
+      const s = anSites().find(z => z.id === AF.site);
+      if (s && AF.status && stKey(s) !== AF.status) AF.site = "";
+      anRender();
+    }));
+    document.querySelectorAll("#fPeriod button").forEach(b => b.addEventListener("click", () => { AF.months = +b.dataset.v; anRender(); }));
+    $("#biReset").addEventListener("click", () => { AF = {site:"", status:"", reason:"", months:6}; anRender(); toast("Filters cleared"); });
+    $("#biPills").addEventListener("click", e => { const k = e.target.closest("[data-clear]"); if (k){ AF[k.dataset.clear] = ""; anRender(); } });
+    document.querySelectorAll("[data-focus]").forEach(b => b.addEventListener("click", () => toggleFocus(b.closest(".tile"))));
+    anRender();
   }
   if (key === "portfolio"){
     document.querySelectorAll("[data-site]").forEach(b => b.addEventListener("click", () => {
@@ -2004,6 +2486,7 @@ function bind(key){
     const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
     root.dataset.theme = dark ? "light" : "dark";
     try { localStorage.setItem("pm-theme", root.dataset.theme); } catch(e){}
+    setTimeout(refreshAnalytics, 30);
   });
 })();
 
@@ -2013,7 +2496,7 @@ function bind(key){
   if (!host) return;
   host.insertAdjacentHTML("afterbegin", '<div class="bg-grid"></div>');
   let m = "";
-  for (let i = 0; i < 24; i++){
+  for (let i = 0; i < 14; i++){
     const left = (i * 37 + 11) % 100, sz = 3 + (i % 4), dur = 18 + (i * 7) % 16, delay = -((i * 5.3) % dur), dx = (i % 2 ? 1 : -1) * (20 + (i * 13) % 60);
     m += `<span class="mote" style="left:${left}%;--s:${sz}px;--dur:${dur}s;--delay:${delay.toFixed(1)}s;--dx:${dx}px;--c:${i % 3 ? "var(--plan)" : "var(--act)"}"></span>`;
   }
@@ -2027,7 +2510,7 @@ function bind(key){
     if (!(x + w > 1150 && x < 1290)){
       sk += `<rect x="${x}" y="${240 - h}" width="${w}" height="${h}" ${fill(15)}/>`;
       for (let r = 0; r < Math.floor((h - 16) / 18); r++) for (let c = 0; c < Math.floor((w - 12) / 18); c++)
-        if ((r * 7 + c * 3 + k) % 4 === 0) sk += `<rect class="bwin" x="${x + 8 + c * 18}" y="${240 - h + 10 + r * 18}" width="8" height="8" style="fill:var(--act);fill-opacity:.15;--w:${(r * 3 + c * 5 + k) % 6}s"/>`;
+        if ((r * 7 + c * 3 + k) % 6 === 0) sk += `<rect class="bwin" x="${x + 8 + c * 18}" y="${240 - h + 10 + r * 18}" width="8" height="8" style="fill:var(--act);fill-opacity:.15;--w:${(r * 3 + c * 5 + k) % 6}s"/>`;
     }
     x += w + 40 + (k * 17) % 50; k++;
   }
@@ -2050,10 +2533,18 @@ function bind(key){
 })();
 
 window.addEventListener("hashchange", route);
+// Links to the page you are already on still show the loader and refresh the page
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || e.defaultPrevented || a.id === "forgotLink") return;
+  const target = a.getAttribute("href");
+  if (target.length > 1 && target === location.hash){ e.preventDefault(); route(); }
+});
 (function boot(){
   const sp = document.getElementById("splash");
   if (REDUCED || !sp){ if (sp) sp.remove(); route(); return; }
-  setTimeout(() => { route(); sp.classList.add("gone"); setTimeout(() => sp.remove(), 700); }, 1400);
+  setTimeout(() => { route(); sp.classList.add("gone"); setTimeout(() => sp.remove(), 600); }, 550);
+  setTimeout(() => loadECharts().catch(() => {}), 2500);
 })();
 </script>
 </body>
