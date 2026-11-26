@@ -1141,6 +1141,47 @@ body.auth .slide{will-change:opacity;backface-visibility:hidden;transition:opaci
 body.auth .slide::after{will-change:auto}
 body.auth .slide.on{animation:kenburnsHD 8s ease-out forwards;will-change:opacity,transform}
 @media (min-width:2400px){body.auth .slide.on{animation:none}}
+/* Idle sign-out warning */
+.idle-overlay{position:fixed;inset:0;z-index:96;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:fadeIn .2s}
+.idle-card{width:100%;max-width:400px;padding:26px 24px 22px;text-align:center;background:var(--glass-strong);animation:pop .35s cubic-bezier(.2,1.2,.4,1)}
+.idle-ico{width:52px;height:52px;margin:0 auto;border-radius:50%;display:grid;place-items:center;color:var(--act);background:color-mix(in srgb,var(--act) 16%,transparent)}
+.idle-ico svg{width:26px;height:26px}
+.idle-card h2{font-size:20px;margin:12px 0 6px}
+.idle-card p{margin:0;color:var(--muted);font-size:14.5px}
+.idle-card b{color:var(--text);font-variant-numeric:tabular-nums}
+.idle-actions{display:flex;gap:10px;margin-top:20px}
+.idle-actions .btn{flex:1;justify-content:center}
+/* Login always uses the full width, even if the sidebar was collapsed before signing out */
+body.auth.side-collapsed .app,body.auth .app{grid-template-columns:minmax(0,1fr)}
+/* Home hero: tighter layout, less empty space */
+.intro{align-items:center;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.intro-copy{padding:26px 8px 26px 30px}
+.intro .actions{margin-top:18px}
+.ticks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px;max-width:660px}
+.tick{padding:10px 12px}
+.tick span{display:block;line-height:1.3}
+.intro-art{align-self:end;justify-content:flex-end;padding:10px 14px 0 0}
+.intro-art svg{width:auto;max-width:100%;max-height:360px;margin-left:auto}
+@media (max-width:1180px){.intro{grid-template-columns:minmax(0,1fr)}.intro-art{justify-content:center;padding:0 12px}.intro-art svg{max-height:300px;margin:0 auto}}
+@media (max-width:600px){.ticks{grid-template-columns:1fr 1fr}.intro-copy{padding:20px 18px 6px}}
+.intro-art{justify-content:center}
+.intro-art svg{margin:0 auto}
+@media (max-width:900px){body.side-collapsed .app{grid-template-columns:minmax(0,1fr)}}
+/* Home tagline on one line */
+.tagline{white-space:nowrap}
+.tagline span{color:var(--act)}
+@media (max-width:600px){.tagline{white-space:normal}}
+.live-top{display:flex;margin-bottom:8px}
+/* Home: fill tall screens */
+.home-extras{flex:1}
+.home-extras .log{max-height:none}
+/* Compact construction animation inside the home status panel */
+.home-hero-main{display:flex;align-items:center;gap:18px;padding-top:18px;padding-bottom:12px}
+.hm-text{flex:1;min-width:0}
+.hm-art{flex:0 0 clamp(190px,20vw,290px);align-self:flex-end}
+.hm-art svg{width:100%;height:auto;display:block;max-height:210px}
+@media (max-width:1180px){.hm-art{flex-basis:clamp(170px,30vw,260px)}}
+@media (max-width:600px){.home-hero-main{flex-direction:column;align-items:stretch}.hm-art{flex-basis:auto;width:78%;margin:0 auto;align-self:center}}
 </style>
 </head>
 <body>
@@ -2686,35 +2727,39 @@ function viewPortfolio(){
   const late = live.filter(s => s.delay > 7).length;
   const behind = live.filter(s => s.delay > 0);
   const avg = behind.length ? Math.round(behind.reduce((a,s) => a + s.delay, 0) / behind.length) : 0;
+  const worst = behind.slice().sort((x, y) => y.delay - x.delay);
+  const MS = Object.values(MODELS), wSum = MS.reduce((a, m) => a + m.W_ALL, 0);
+  const totAct = MS.reduce((a, m) => a + m.PROJECT.pAct * m.W_ALL, 0) / wSum, totPlan = MS.reduce((a, m) => a + m.PROJECT.pPlan * m.W_ALL, 0) / wSum;
   return `
-  <section class="glass intro" aria-label="Welcome">
-    <div class="intro-copy">
-      <span class="live"><i></i>Live from ${SITES.length} sites, as of ${fmt(TODAY)}</span>
-      <h1><span>Every site.</span><span>Every floor.</span><span>Every day.</span></h1>
-      <p class="sub">Progress Maker turns daily site reports into a live picture of planned against actual, so a delay shows up the day it happens, not at the month-end review.</p>
-      <div class="actions">
-        <a class="btn primary" href="#project" data-open-site="eden">${ICONS.project}Open Morais Eden</a>
-        <a class="btn" href="#analytics">${ICONS.analytics}Analytics</a>
-        <a class="btn" href="#new">${ICONS.new}New project</a>
-        <button class="btn" type="button" data-print>${ICONS.print}Export PDF</button>
-      </div>
-      <div class="ticks">
-        <div class="tick"><b data-count="${Object.values(MODELS).reduce((a, m) => a + m.TASKS.length, 0)}">0</b><span>activities on live schedules</span></div>
-        <div class="tick"><b data-count="${Object.keys(MODELS).length}">0</b><span>sites tracked against their final schedule</span></div>
-        <div class="tick"><b data-count="${Object.values(MODELS).reduce((a, m) => a + m.DELAYS.length, 0)}">0</b><span>delay reasons logged from site</span></div>
-      </div>
+  <header class="page-head">
+    <div>
+      <span class="live live-top"><i></i>Live from ${SITES.length} sites, as of ${fmt(TODAY)}</span>
+      <h1 class="tagline">Every site. Every floor. <span>Every day.</span></h1>
+      <p class="sub">${SITES.length} Morais projects, ${Object.keys(MODELS).length} tracked against their final schedules.</p>
     </div>
-    <div class="intro-art">${sceneSVG()}</div>
+    <div class="actions">
+      <a class="btn" href="#analytics">${ICONS.analytics}Analytics</a>
+      <a class="btn" href="#new">${ICONS.new}New project</a>
+      <button class="btn" type="button" data-print>${ICONS.print}Export PDF</button>
+      <a class="btn primary" href="#project" data-open-site="eden">${ICONS.project}Open Morais Eden</a>
+    </div>
+  </header>
+
+  <section class="glass hero" aria-label="Portfolio status">
+    <div class="hero-main home-hero-main"><div class="hm-text">
+      <div class="hero-num"><b data-count="${warn + late}" style="color:var(--${late ? "late" : warn ? "warn" : "ok"})">0</b><span>sites behind<br>plan</span></div>
+      <p>${worst.length ? `<strong>${esc(worst[0].name)}</strong> is furthest behind at ${plural(worst[0].delay, "day")}${worst[1] ? `, followed by <strong>${esc(worst[1].name)}</strong> at ${plural(worst[1].delay, "day")}` : ""}. ` : ""}<strong>${ok}</strong> ${ok === 1 ? "site is" : "sites are"} on track or ahead. Across the ${Object.keys(MODELS).length} live schedules, <strong>${pctTxt(totAct)}</strong> of the work is done against <strong>${pctTxt(totPlan)}</strong> planned for today.</p>
+    </div><div class="hm-art">${sceneSVG()}</div></div>
+    <dl class="facts">
+      <div><dt>On track or ahead</dt><dd style="color:var(--ok)"><span data-count="${ok}">0</span><small>No delay against plan</small></dd></div>
+      <div><dt>Slipping</dt><dd style="color:var(--warn)"><span data-count="${warn}">0</span><small>Up to a week behind</small></dd></div>
+      <div><dt>Delayed</dt><dd style="color:var(--late)"><span data-count="${late}">0</span><small>More than a week behind</small></dd></div>
+      <div><dt>Average delay</dt><dd><span data-count="${avg}">0</span> days<small>Across sites that are behind</small></dd></div>
+      <div><dt>Activities tracked</dt><dd><span data-count="${Object.values(MODELS).reduce((a, m) => a + m.TASKS.length, 0)}">0</span><small>On the live schedules</small></dd></div>
+      <div><dt>Delay reasons logged</dt><dd><span data-count="${Object.values(MODELS).reduce((a, m) => a + m.DELAYS.length, 0)}">0</span><small>From site, as of ${fmt(TODAY, true)}</small></dd></div>
+    </dl>
   </section>
   ${tickerHTML()}
-
-  <section class="glass strip" aria-label="Summary">
-    <div class="stat"><b data-count="${SITES.length}">0</b><span>Projects</span></div>
-    <div class="stat ok"><b data-count="${ok}">0</b><span>On track or ahead</span></div>
-    <div class="stat warn"><b data-count="${warn}">0</b><span>Slipping, up to a week</span></div>
-    <div class="stat late"><b data-count="${late}">0</b><span>Delayed more than a week</span></div>
-    <div class="stat"><b><span data-count="${avg}">0</span> d</b><span>Average delay where late</span></div>
-  </section>
 
   <section class="glass sites" aria-label="Sites">
     <div class="sites-head">
@@ -2734,7 +2779,32 @@ function viewPortfolio(){
         <span class="site-ho"><small>Handover</small>${esc(s.handover)}</span>
       </button>`;
     }).join("")}
-  </section>`;
+  </section>
+  ${portfolioExtras()}`;
+}
+function portfolioExtras(){
+  const sites = anSites();
+  const ms = anMilestones(sites).slice(0, 7);
+  const since = TODAY - 90;
+  const ev = anEvents().filter(e => e.d >= since);
+  const sums = CATS.map(c => [c, ev.filter(e => e.cat === c).reduce((a, e) => a + e.days, 0)]);
+  const total = sums.reduce((a, x) => a + x[1], 0), max = Math.max(1, ...sums.map(x => x[1]));
+  const crew = sites.reduce((a, s) => { const r = crewAt(s, TODAY); return [a[0] + r[0], a[1] + r[1]]; }, [0, 0]);
+  const recent = ev.slice().sort((x, y) => y.d - x.d).slice(0, 4);
+  const nameOf = id => (SITES.find(s => s.id === id) || {}).name || id;
+  return `<div class="grid2 home-extras">
+    <section class="glass panel">
+      <h2>Coming up in the next 30 days</h2>
+      <p class="hint">Milestones across all sites, with the expected date from the latest site updates.</p>
+      <ul class="bi-ms">${ms.length ? ms.map((m, i) => `<li style="animation-delay:${i * 50}ms"><span class="dot2 ${m.v > 0 ? "late" : "ok"}"></span><div><b>${esc(m.name)}</b><small>${esc(m.site)}</small></div><div class="right"><small>${fmt(m.af)}</small>${m.v > 0 ? `<span class="chip warn">+${plural(m.v, "day")}</span>` : `<span class="chip ok">On time</span>`}</div></li>`).join("") : `<li><div><b>No milestones due in the next 30 days</b></div></li>`}</ul>
+    </section>
+    <section class="glass panel">
+      <h2>Why sites are losing time</h2>
+      <p class="hint">${plural(total, "day")} lost across all sites in the last 90 days. ${crew[1]} of ${crew[0]} planned workers are on site today.</p>
+      ${sums.map(([c, v]) => `<div class="reason"><span>${c}</span><span class="bar" style="--a:${v / max * 100}%"><i></i></span><b>${v} d</b></div>`).join("")}
+      <ul class="log">${recent.map(x => `<li><p><strong>${esc(nameOf(x.site))}</strong>: ${esc(x.task)}</p><span class="chip late">${plural(x.days, "day")}</span><span class="meta">${fmt(x.d)}, ${esc(x.cat)}</span></li>`).join("")}</ul>
+    </section>
+  </div>`;
 }
 
 /* ---------- View: project ---------- */
@@ -4218,6 +4288,50 @@ function bind(key){
   const bpB = `<svg class="bp-shape s2" viewBox="0 0 200 200"><g style="fill:none;stroke:var(--act);stroke-width:1"><rect x="40" y="40" width="120" height="120" stroke-dasharray="6 5"/><path d="M40 40 L160 160 M160 40 L40 160"/><circle cx="100" cy="100" r="30"/><path d="M20 40 V160 M16 40 H24 M16 160 H24"/></g></svg>`;
   host.insertAdjacentHTML("beforeend", `<div class="beam"></div>${bpA}${bpB}${m}${sk}`);
 })();
+
+/* ---------- Auto sign-out after 15 minutes without activity ---------- */
+const IDLE_LIMIT = 15 * 60 * 1000, IDLE_WARN = 60 * 1000;
+let lastActive = Date.now(), idleBox = null;
+const onLoginPage = () => document.body.classList.contains("auth");
+function markActive(){ if (!idleBox) lastActive = Date.now(); }
+["mousemove", "mousedown", "keydown", "wheel", "touchstart", "scroll"].forEach(ev => window.addEventListener(ev, markActive, {passive:true, capture:true}));
+function closeIdle(){ if (idleBox){ idleBox.remove(); idleBox = null; } }
+function idleSignOut(){
+  closeIdle(); lastActive = Date.now();
+  location.hash = "login";
+  setTimeout(() => toast("Signed out after 15 minutes without activity."), 900);
+}
+function showIdleWarning(){
+  idleBox = document.createElement("div");
+  idleBox.className = "idle-overlay";
+  idleBox.setAttribute("role", "alertdialog"); idleBox.setAttribute("aria-modal", "true"); idleBox.setAttribute("aria-labelledby", "idleTitle");
+  idleBox.innerHTML = `<div class="glass idle-card">
+    <span class="idle-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg></span>
+    <h2 id="idleTitle">Still there?</h2>
+    <p>For security, you’ll be signed out in <b id="idleSecs">60</b> seconds because there’s been no activity for a while.</p>
+    <div class="idle-actions"><button class="btn" type="button" id="idleOut">Sign out now</button><button class="btn primary" type="button" id="idleStay">Stay signed in</button></div>
+  </div>`;
+  document.body.appendChild(idleBox);
+  idleBox.querySelector("#idleStay").addEventListener("click", () => { closeIdle(); lastActive = Date.now(); toast("You’re still signed in."); });
+  idleBox.querySelector("#idleOut").addEventListener("click", () => { closeIdle(); lastActive = Date.now(); location.hash = "login"; });
+  setTimeout(() => { const b = idleBox && idleBox.querySelector("#idleStay"); if (b) b.focus(); }, 50);
+}
+setInterval(() => {
+  if (onLoginPage()){ closeIdle(); lastActive = Date.now(); return; }
+  const idle = Date.now() - lastActive;
+  if (idle >= IDLE_LIMIT){ idleSignOut(); return; }
+  if (idle >= IDLE_LIMIT - IDLE_WARN){
+    if (!idleBox) showIdleWarning();
+    const s = document.getElementById("idleSecs"); if (s) s.textContent = Math.max(1, Math.ceil((IDLE_LIMIT - idle) / 1000));
+  }
+}, 1000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !onLoginPage() && Date.now() - lastActive >= IDLE_LIMIT) idleSignOut(); });
+
+// Keep "today" current: if the date changes while the app is open (past midnight), refresh to the new day's figures
+setInterval(() => {
+  const n = new Date(), d = Math.round(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / 864e5);
+  if (d !== TODAY && !document.querySelector(".idle-overlay, .ck-overlay, .celebrate")) location.reload();
+}, 60 * 1000);
 
 window.addEventListener("hashchange", route);
 // Links to the page you are already on still show the loader and refresh the page
